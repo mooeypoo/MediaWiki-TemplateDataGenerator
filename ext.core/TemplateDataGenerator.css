@@ -1,0 +1,12 @@
+#btnTemplateDataGenerator {
+	padding: 5px;
+	font-size: 120%;
+}
+
+.editTable {
+	width: 100%;
+}
+
+.editTable tr {
+	border: 1px solid;
+}
