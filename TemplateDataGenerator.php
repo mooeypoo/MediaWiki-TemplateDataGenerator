@@ -50,12 +50,17 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 	),
 	'messages' => array(
 		'templatedatagenerator-modal-title',
+		'templatedatagenerator-modal-title-templatedesc',
+		'templatedatagenerator-modal-title-templateparams',
 		'templatedatagenerator-modal-table-param-name',
+		'templatedatagenerator-modal-table-param-aliases',
+		'templatedatagenerator-modal-table-param-label',
 		'templatedatagenerator-modal-table-param-desc',
 		'templatedatagenerator-modal-table-param-type',
 		'templatedatagenerator-modal-table-param-default',
 		'templatedatagenerator-modal-table-param-required',
 		'templatedatagenerator-modal-table-param-actions',
+		'templatedatagenerator-modal-button-addparam',
 		'templatedatagenerator-modal-buttons-apply',
 		'templatedatagenerator-modal-buttons-cancel',
 	)

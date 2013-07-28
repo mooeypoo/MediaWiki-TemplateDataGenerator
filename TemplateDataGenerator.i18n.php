@@ -19,12 +19,39 @@ $messages['en'] = array(
 	'templatedatagenerator-desc'     => 'Assists with the generation and editing of the necessary JSON string required for VisualEditor\'s TemplateData',
 	'templatedatagenerator-editbutton'    => 'Generate TemplateData',
 	'templatedatagenerator-modal-title' => 'TemplateData Generator',
-	'templatedatagenerator-modal-table-param-name' => 'Parameter',
+	'templatedatagenerator-modal-title-templatedesc' => 'Template Description',
+	'templatedatagenerator-modal-title-templateparams' => 'Template Parameters',
+	'templatedatagenerator-modal-table-param-name' => 'Name',
+	'templatedatagenerator-modal-table-param-aliases' => 'Aliases',
+	'templatedatagenerator-modal-table-param-label' => 'Label',
 	'templatedatagenerator-modal-table-param-desc' => 'Description',
 	'templatedatagenerator-modal-table-param-type' => 'Type',
 	'templatedatagenerator-modal-table-param-default' => 'Default',
 	'templatedatagenerator-modal-table-param-required' => 'Required',
 	'templatedatagenerator-modal-table-param-actions' => 'Actions',
+	'templatedatagenerator-modal-button-addparam' => 'Add Parameter',
 	'templatedatagenerator-modal-buttons-apply'    => 'Apply',
 	'templatedatagenerator-modal-buttons-cancel'    => 'Cancel',
+);
+
+/** Message documentation (Message documentation)
+ * @author Moriel Schottlender
+ */
+$messages['qqq'] = array(
+	'templatedatagenerator-desc'     => 'Extension description.',
+	'templatedatagenerator-editbutton'    => 'The label of the button, appearing above the editor field.',
+	'templatedatagenerator-modal-title' => 'Title of the modal popup.',
+	'templatedatagenerator-modal-title-templatedesc' => 'The title for the template description',
+	'templatedatagenerator-modal-title-templateparams' => 'The title for the template parameters',
+	'templatedatagenerator-modal-table-param-name' => 'Label: Name of the parameter',
+	'templatedatagenerator-modal-table-param-aliases' => 'Label: Aliases of the parameter',
+	'templatedatagenerator-modal-table-param-label' => 'Label: Label of the parameter',
+	'templatedatagenerator-modal-table-param-desc' => 'Label: Description of the parameter',
+	'templatedatagenerator-modal-table-param-type' => 'Label: Type of the parameter',
+	'templatedatagenerator-modal-table-param-default' => 'Label: Default value of the parameter',
+	'templatedatagenerator-modal-table-param-required' => 'Label: Required status of the parameter',
+	'templatedatagenerator-modal-table-param-actions' => 'Label: Parameter actions in the table',
+	'templatedatagenerator-modal-button-addparam' => 'Button to add a parameter',
+	'templatedatagenerator-modal-buttons-apply'    => 'Label of the apply button',
+	'templatedatagenerator-modal-buttons-cancel'    => 'Label of the cancel button',
 );

@@ -3,10 +3,19 @@
 	font-size: 120%;
 }
 
-.editTable {
+.tdg-editTable {
 	width: 100%;
 }
 
-.editTable tr {
+.tdg-editTable .tdg-tr-head {
+	font-size: 150%;
+}
+ 
+.tdg-title {
+	font-size: 200%;
+}
+
+
+.tdg-editTable tr {
 	border: 1px solid;
 }
