@@ -117,17 +117,17 @@ $( document ).ready( function() {
 		var addButton = $( '<button>', { 'id': 'tdg_add_param', 'class': 'tdg-button-add-param', 'text': mw.message( 'templatedatagenerator-modal-button-addparam' ) } );
 		addButton.click( function() {
 			//add empty row:
-				var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + pCounter );
-				tbl.append( getRow( 'tdg-tr-param', [
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pName_' + pCounter, 'value': '' } ) },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pAliases_' + pCounter, 'value': '' } ) },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pLabel_' + pCounter, 'value': '' } ) },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDesc_' + pCounter, 'value': '' } ) },
-					{ html: tSelect },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDefault_' + pCounter, 'value': '' } ) },
-					{ html: $( '<input>', { 'type': 'checkbox', 'id': 'tdg_p_' + pCounter, 'value': 'required' } ) }
-				] ) );
-				pCounter++;
+			var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + pCounter );
+			tbl.append( getRow( 'tdg-tr-param', [
+				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pName_' + pCounter, 'value': '' } ) },
+				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pAliases_' + pCounter, 'value': '' } ) },
+				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pLabel_' + pCounter, 'value': '' } ) },
+				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDesc_' + pCounter, 'value': '' } ) },
+				{ html: tSelect },
+				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDefault_' + pCounter, 'value': '' } ) },
+				{ html: $( '<input>', { 'type': 'checkbox', 'id': 'tdg_p_' + pCounter, 'value': 'required' } ) }
+			] ) );
+			pCounter++;
 		} );
 		
 		// Build the GUI

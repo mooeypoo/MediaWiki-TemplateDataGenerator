@@ -42,8 +42,8 @@ $templdatagenResourceTemplate = array(
 
 # Modules:
 $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate + array(
-	'styles' => 'ext.core/TemplateDataGenerator.css',
-	'scripts' => 'ext.core/TemplateDataGenerator.js',
+	'styles' => 'modules/TemplateDataGenerator.css',
+	'scripts' => 'modules/TemplateDataGenerator.js',
 	'position' => 'top',
 	'dependencies' => array(
 		'jquery.ui.dialog'
