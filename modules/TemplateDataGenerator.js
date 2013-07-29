@@ -234,6 +234,7 @@
 				console.log( $( '#tdg_pType_' + trID ).val() );
 				jsonOut.params[ paramName ].label = $( '#tdg_pLabel_' + trID ).val();
 				jsonOut.params[ paramName ]['type'] = $( '#tdg_pType_' + trID ).val();
+				// TODO: Deal with language in description
 				jsonOut.params[ paramName ].description = $( '#tdg_pDesc_' + trID ).val();
 				jsonOut.params[ paramName ].required = $( '#tdg_pRequired_' + trID ).val();
 				jsonOut.params[ paramName ]['default'] = $( '#tdg_pDefault_' + trID ).val();
