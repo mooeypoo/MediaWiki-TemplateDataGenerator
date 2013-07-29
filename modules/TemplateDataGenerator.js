@@ -99,7 +99,6 @@ $( document ).ready( function() {
 					var delButton = $( '<button>' ).attr( 'id', 'tdg_pButton_' + rowCounter ).addClass( 'tdg-param-button-delete' ).attr( 'data-paramnum', rowCounter ).text( mw.message( 'templatedatagenerator-modal-button-delparam' ) );
 					delButton.click( function() {
 						$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
-		//				$( this ).closest( 'tr' ).get( 0 ).remove();
 					} );
 
 					// Add row:
@@ -112,7 +111,7 @@ $( document ).ready( function() {
 						{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ).val( pDefault ) },
 						{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ).prop( 'checked', reqChecked ) },
 						{ html: delButton }
-					] ) );
+					] ).attr( 'data-paramnum', rowCounter ) );
 					rowCounter++;
 				}
 			}
@@ -121,6 +120,10 @@ $( document ).ready( function() {
 			var addButton = $( '<button>' ).attr( 'id', 'tdg_add_param').addClass( 'tdg-button-add-param' ).text( mw.message( 'templatedatagenerator-modal-button-addparam' ) );
 			addButton.click( function() {
 				//add empty row:
+				var delButton = $( '<button>' ).attr( 'id', 'tdg_pButton_' + rowCounter ).addClass( 'tdg-param-button-delete' ).attr( 'data-paramnum', rowCounter ).text( mw.message( 'templatedatagenerator-modal-button-delparam' ) );
+				delButton.click( function() {
+					$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
+				} );
 				var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
 				tbl.append( getRow( 'tdg-tr-param tdg-paramcount-' + rowCounter, [
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pName_' + rowCounter ) },
@@ -131,7 +134,7 @@ $( document ).ready( function() {
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ) },
 					{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ) },
 					{ html: delButton }
-				] ) );
+				] ).attr( 'data-paramnum', rowCounter ) );
 				rowCounter++;
 			} );
 
@@ -159,15 +162,16 @@ $( document ).ready( function() {
 			jsonOut.params = {};
 			// Go over the table:
 			$( '.tdg-editTable tr:gt(0)' ).each( function( index ) {
-				jsonOut.params[ $( '#tdg_pName_' + index ).val() ] = {
-					'label': $( '#tdg_pLabel_' + index ).val(),
-					'type': $( '#tdg_pType_' + index ).val(),
-					'description': $( '#tdg_pDesc_' + index ).val(),
-					'required': $( '#tdg_pRequired_' + index ).val(),
-					'default': $( '#tdg_pDefault_' + index ).val()
+				var trID = $( this ).attr( 'data-paramnum' );
+				jsonOut.params[ $( '#tdg_pName_' + trID ).val() ] = {
+					'label': $( '#tdg_pLabel_' + trID ).val(),
+					'type': $( '#tdg_pType_' + trID ).val(),
+					'description': $( '#tdg_pDesc_' + trID ).val(),
+					'required': $( '#tdg_pRequired_' + trID ).val(),
+					'default': $( '#tdg_pDefault_' + trID ).val()
 				};
-				if ( $( '#tdg_pAliases_' + index ).val() ) {
-					jsonOut.params[ $( '#tdg_pName_' + index ).val() ].aliases = $( '#tdg_pAliases_' + index ).val().split(",");
+				if ( $( '#tdg_pAliases_' + trID ).val() ) {
+					jsonOut.params[ $( '#tdg_pName_' + trID ).val() ].aliases = $( '#tdg_pAliases_' + trID ).val().split(",");
 				}
 			} );
 
