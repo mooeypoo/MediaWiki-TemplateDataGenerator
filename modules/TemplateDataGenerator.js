@@ -7,7 +7,8 @@ $( document ).ready( function() {
 			'string/wiki-user-name': mw.message( 'templatedatagenerator-modal-table-param-type-user' ),
 			'string/wiki-page-name': mw.message( 'templatedatagenerator-modal-table-param-type-page' )
 		},
-		rowCounter = 0;
+		rowCounter = 0,
+		modalBox = $( '.tdg-editscreen-modal-form' );
 
 	$('.tdg-editscreen-main-button').click( function() {
 		var param, newTemplateData = false, error = false;
@@ -139,7 +140,7 @@ $( document ).ready( function() {
 			} );
 
 			// Build the GUI
-			$( '.tdg-editscreen-modal-form' )
+			modalBox
 				.append( $( '<span>' ).addClass( 'tdg-title' ).text( mw.message( 'templatedatagenerator-modal-title-templatedesc' ) ) )
 				.append( descText )
 				.append( $( '<span>' ).addClass( 'tdg-title' ).text( mw.message( 'templatedatagenerator-modal-title-templateparams' ) ) )
@@ -147,13 +148,14 @@ $( document ).ready( function() {
 				.append( addButton );
 
 			// Call the modal:
-			i18nModal( mw.message( 'templatedatagenerator-modal-buttons-apply' ), mw.message( 'templatedatagenerator-modal-buttons-cancel' ) );
+			i18nModal( mw.message( 'templatedatagenerator-modal-buttons-apply' ), mw.message( 'templatedatagenerator-modal-buttons-cancel' ), modalBox );
+			modalBox.dialog( 'open' );
 		}
 
 	} );
 
 	/** Modal Setup **/
-	var i18nModal = function( btnApply, btnCancel ) {
+	var i18nModal = function( btnApply, btnCancel, modalBox ) {
 		var modalButtons = {};
 		modalButtons[btnApply] = function() {
 			var jsonOut = {};
@@ -185,13 +187,13 @@ $( document ).ready( function() {
 				finalOutput = wikicontent + '\n<templatedata>\n' + JSON.stringify( jsonOut, null, '	' ) + '\n</templatedata>';
 			}
 			$( '#wpTextbox1' ).val( finalOutput );
-			$( '.tdg-editscreen-modal-form' ).dialog( 'close' );
+			modalBox.dialog( 'close' );
 		};
 		modalButtons[btnCancel] = function() {
-			$( '.tdg-editscreen-modal-form' ).dialog( 'close' );
+			modalBox.dialog( 'close' );
 		};
 
-		$( '.tdg-editscreen-modal-form' ).dialog({
+		modalBox.dialog({
 			autoOpen: false,
 			height: window.innerHeight * 0.8,
 			width: window.innerWidth * 0.8,
@@ -199,12 +201,10 @@ $( document ).ready( function() {
 			buttons: modalButtons,
 			close: function() {
 				// Reset:
-				$( '.tdg-editscreen-modal-form' ).empty();
+				modalBox.empty();
 				rowCounter = 0;
 			}
 		});
-
-		$( '.tdg-editscreen-modal-form' ).dialog( 'open' );
 
 	};
 
