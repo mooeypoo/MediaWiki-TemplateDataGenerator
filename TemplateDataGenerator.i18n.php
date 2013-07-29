@@ -5,19 +5,20 @@
  * @file
  * @ingroup Extensions
  * @author Moriel Schottlender <moo@smarterthanthat.com>
- * @copyright  
+ * @copyright
  * @licence GNU General Public Licence 2.0 or later
  */
 
 $messages = array();
 
 /** English
- * @author Moriel Schottlender 
+ * @author Moriel Schottlender
  */
 $messages['en'] = array(
 	'templatedatagenerator-title'    => 'TemplateData Generator',
 	'templatedatagenerator-desc'     => 'Assists with the generation and editing of the necessary JSON string required for VisualEditor\'s TemplateData',
 	'templatedatagenerator-editbutton'    => 'Generate TemplateData',
+	'templatedatagenerator-errormsg-jsonbadformat' => 'Bad JSON format. Either correct it, or delete the text between the <templatedata> tags and try again.',
 	'templatedatagenerator-modal-title' => 'TemplateData Generator',
 	'templatedatagenerator-modal-title-templatedesc' => 'Template Description',
 	'templatedatagenerator-modal-title-templateparams' => 'Template Parameters',
@@ -45,6 +46,7 @@ $messages['en'] = array(
 $messages['qqq'] = array(
 	'templatedatagenerator-desc'     => 'Extension description.',
 	'templatedatagenerator-editbutton'    => 'The label of the button, appearing above the editor field.',
+	'templatedatagenerator-errormsg-jsonbadformat' => 'Error message that appears in case the JSON string is not possible to parse. The user is asked to either correct the json syntax or delete the values between the &lt;templatedata&gt; tags and try again.',
 	'templatedatagenerator-modal-title' => 'Title of the modal popup.',
 	'templatedatagenerator-modal-title-templatedesc' => 'The title for the template description',
 	'templatedatagenerator-modal-title-templateparams' => 'The title for the template parameters',

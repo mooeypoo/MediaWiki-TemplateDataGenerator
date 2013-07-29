@@ -5,10 +5,10 @@
  * @file
  * @ingroup Extensions
  * @author Moriel Schottlender <moo@smarterthanthat.com>
- * @copyright  
+ * @copyright
  * @licence GNU General Public Licence 2.0 or later
  */
- 
+
 if( !defined( 'MEDIAWIKI' ) ) {
 	echo( "This file is an extension to the MediaWiki software and cannot be used standalone.\n" );
 	die();
@@ -33,7 +33,6 @@ $wgAutoloadClasses['TemplateDataGeneratorHooks'] = dirname( __FILE__ ) . "/Templ
 # Hook button up to Editing
 $wgHooks['EditPage::showEditForm:initial'][] = array( 'TemplateDataGeneratorHooks::initGeneratorInEditForm' );
 
-
 # Resources
 $templdatagenResourceTemplate = array(
 	'localBasePath' => dirname(__FILE__),
@@ -50,6 +49,7 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 	),
 	'messages' => array(
 		'templatedatagenerator-modal-title',
+		'templatedatagenerator-errormsg-jsonbadformat',
 		'templatedatagenerator-modal-title-templatedesc',
 		'templatedatagenerator-modal-title-templateparams',
 		'templatedatagenerator-modal-table-param-name',

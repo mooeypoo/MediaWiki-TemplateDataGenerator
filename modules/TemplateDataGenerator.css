@@ -3,6 +3,12 @@
 	font-size: 120%;
 }
 
+.tdg-editscreen-error-msg {
+	color: #A80000;
+	font-size: 150%;
+	padding: 15px;
+}
+
 .tdg-editTable {
 	width: 100%;
 }
@@ -10,7 +16,7 @@
 .tdg-editTable .tdg-tr-head {
 	font-size: 150%;
 }
- 
+
 .tdg-title {
 	font-size: 200%;
 }
