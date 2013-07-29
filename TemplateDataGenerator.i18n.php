@@ -15,9 +15,9 @@ $messages = array();
  * @author Moriel Schottlender
  */
 $messages['en'] = array(
-	'templatedatagenerator-title'    => 'TemplateData Generator',
-	'templatedatagenerator-desc'     => 'Assists with the generation and editing of the necessary JSON string required for VisualEditor\'s TemplateData',
-	'templatedatagenerator-editbutton'    => 'Generate TemplateData',
+	'templatedatagenerator-title' => 'TemplateData Generator',
+	'templatedatagenerator-desc' => 'Assists with the generation and editing of the necessary JSON string required for VisualEditor\'s TemplateData',
+	'templatedatagenerator-editbutton' => 'Generate TemplateData',
 	'templatedatagenerator-errormsg-jsonbadformat' => 'Bad JSON format. Either correct it, or delete the text between the <templatedata> tags and try again.',
 	'templatedatagenerator-modal-title' => 'TemplateData Generator',
 	'templatedatagenerator-modal-title-templatedesc' => 'Template Description',
@@ -37,16 +37,16 @@ $messages['en'] = array(
 	'templatedatagenerator-modal-table-param-actions' => 'Actions',
 	'templatedatagenerator-modal-button-addparam' => 'Add Parameter',
 	'templatedatagenerator-modal-button-delparam' => 'Delete Parameter',
-	'templatedatagenerator-modal-buttons-apply'    => 'Apply',
-	'templatedatagenerator-modal-buttons-cancel'    => 'Cancel',
+	'templatedatagenerator-modal-buttons-apply' => 'Apply',
+	'templatedatagenerator-modal-buttons-cancel' => 'Cancel',
 );
 
 /** Message documentation (Message documentation)
  * @author Moriel Schottlender
  */
 $messages['qqq'] = array(
-	'templatedatagenerator-desc'     => 'Extension description.',
-	'templatedatagenerator-editbutton'    => 'The label of the button, appearing above the editor field.',
+	'templatedatagenerator-desc' => 'Extension description.',
+	'templatedatagenerator-editbutton' => 'The label of the button, appearing above the editor field.',
 	'templatedatagenerator-errormsg-jsonbadformat' => 'Error message that appears in case the JSON string is not possible to parse. The user is asked to either correct the json syntax or delete the values between the &lt;templatedata&gt; tags and try again.',
 	'templatedatagenerator-modal-title' => 'Title of the modal popup.',
 	'templatedatagenerator-modal-title-templatedesc' => 'The title for the template description',
@@ -66,6 +66,36 @@ $messages['qqq'] = array(
 	'templatedatagenerator-modal-table-param-actions' => 'Label: Parameter actions in the table',
 	'templatedatagenerator-modal-button-addparam' => 'Button to add a parameter',
 	'templatedatagenerator-modal-button-delparam' => 'Button to delete a parameter',
-	'templatedatagenerator-modal-buttons-apply'    => 'Label of the apply button',
-	'templatedatagenerator-modal-buttons-cancel'    => 'Label of the cancel button',
+	'templatedatagenerator-modal-buttons-apply' => 'Label of the apply button',
+	'templatedatagenerator-modal-buttons-cancel' => 'Label of the cancel button',
+);
+
+/** Hebrew (עברית)
+ * @author Amire80
+ */
+$messages['he'] = array(
+	'templatedatagenerator-title' => 'TemplateData Generator',
+	'templatedatagenerator-desc' => 'מסייע ביצירה ובעריכה של קוד JSON שנחוץ לנתוני תבנית (TemplateData) של העורך החזותי',
+	'templatedatagenerator-editbutton' => 'יצירת נתוני תבנית',
+	'templatedatagenerator-errormsg-jsonbadformat' => 'JSON בלתי־תקין. נא לתאן אותו או למחוק את הטקסט בין תגי <templatedata> ולנסות שוב.',
+	'templatedatagenerator-modal-title' => 'מחולל נתוני תבנית',
+	'templatedatagenerator-modal-title-templatedesc' => 'תיאור תבנית',
+	'templatedatagenerator-modal-title-templateparams' => 'פרמטרי תבנית',
+	'templatedatagenerator-modal-table-param-name' => 'שם',
+	'templatedatagenerator-modal-table-param-aliases' => 'כינויים (מופרדים בפסיק)',
+	'templatedatagenerator-modal-table-param-label' => 'תווית',
+	'templatedatagenerator-modal-table-param-desc' => 'תיאור',
+	'templatedatagenerator-modal-table-param-type' => 'סוג',
+	'templatedatagenerator-modal-table-param-type-undefined' => 'בלתי־מוגדר',
+	'templatedatagenerator-modal-table-param-type-number' => 'מספר',
+	'templatedatagenerator-modal-table-param-type-string' => 'מחרוזת',
+	'templatedatagenerator-modal-table-param-type-user' => 'משתמש',
+	'templatedatagenerator-modal-table-param-type-page' => 'דף',
+	'templatedatagenerator-modal-table-param-default' => 'בררת מחדל',
+	'templatedatagenerator-modal-table-param-required' => 'דרוש',
+	'templatedatagenerator-modal-table-param-actions' => 'פעולות',
+	'templatedatagenerator-modal-button-addparam' => 'הוספת פרמטר',
+	'templatedatagenerator-modal-button-delparam' => 'מחיקת פרמטר',
+	'templatedatagenerator-modal-buttons-apply' => 'החלה',
+	'templatedatagenerator-modal-buttons-cancel' => 'ביטול',
 );
