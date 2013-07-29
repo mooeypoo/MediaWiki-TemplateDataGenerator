@@ -1,7 +1,16 @@
 $( document ).ready( function() {
 	var jsonTmplData;
-	
-	$('#btnTemplateDataGenerator').click( function() { 
+	// TODO: i18n messages for the labels of selOpts
+	var selOpts = {
+			'undefined': 'Unknown',
+			'number': 'Number',
+			'string': 'String',
+			'string/wiki-user-name': 'User',
+			'string/wiki-page-name': 'Page',
+		};
+	var rowCounter = 0; 
+
+	$('.tdg-editscreen-main-button').click( function() { 
 		var wikicontent, tdata,
 			newTemplateData = false;
 		
@@ -28,22 +37,13 @@ $( document ).ready( function() {
 		}
 		
 		/** Create GUI **/
-		$( '#dialog-form' ).html( '' ); //reset
+		$( '#dialog-form' ).empty(); //reset
 		// Create "type" selectbox:
-		selOpts = {
-			'Unknown': 'undefined',
-			'Number': 'number',
-			'String': 'string',
-			'User': 'string/wiki-user-name',
-			'Page': 'string/wiki-page-name',
-		};
-
 		var typeSel = $( '<select>' );
-		typeSel.append( $( '<option>', { 'value': '', 'html': '' } ) );
+		typeSel.append( $( '<option>' ) );
 		for (sel in selOpts) {
-			typeSel.append( $( '<option>', { 'value': selOpts[sel], 'html': sel } ) );
+			typeSel.append( $( '<option>').prop( 'value', sel ).text( selOpts[ sel ] ) );
 		}
-
 
 		// Description:
 		var descText = $( '<textarea>', { 'class': 'tdg-template-desc' });
@@ -66,7 +66,7 @@ $( document ).ready( function() {
 		
 		// Add existing parameters:
 		if ( !newTemplateData && jsonTmplData && jsonTmplData.params ) {
-			var pCounter = 0, pAliases = '';
+			var pAliases = '';
 			for (param in jsonTmplData.params) {
 				
 				// Set up the row:
@@ -84,7 +84,7 @@ $( document ).ready( function() {
 				}
 				
 				// Type:
-				var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + pCounter );
+				var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
 				if ( jsonTmplData.params[param].type ) {
 					tSelect.val( jsonTmplData.params[param].type );
 				} else {
@@ -100,34 +100,34 @@ $( document ).ready( function() {
 
 				// Add row:
 				tbl.append( getRow( 'tdg-tr-param', [
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pName_' + pCounter, 'value': param } ) },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pAliases_' + pCounter, 'value': pAliases } ) },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pLabel_' + pCounter, 'value': jsonTmplData.params[param].label } ) },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDesc_' + pCounter, 'value': pDesc } ) },
+					{ html: $( '<input>' ).attr( 'id', 'tdg_pName_' + rowCounter ).val( param ) },
+					{ html: $( '<input>' ).attr( 'id', 'tdg_pAliases_' + rowCounter ).val( pAliases ) },
+					{ html: $( '<input>' ).attr( 'id', 'tdg_pLabel_' + rowCounter ).val( jsonTmplData.params[param].label ) },
+					{ html: $( '<input>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ).val( pDesc ) },
 					{ html: tSelect },
-					{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDefault_' + pCounter, 'value': pDefault } ) },
-					{ html: $( '<input>', { 'type': 'checkbox', 'id': 'tdg_p_' + pCounter, 'value': 'required', 'checked': reqChecked } ) }
+					{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ).val( pDefault ) },
+					{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ).prop( 'checked', reqChecked ) },
 				] ) );
-				pCounter++;
+				rowCounter++;
 			}
 			console.log(jsonTmplData.params);
 		}
 		
 		// "Add Param" button:
-		var addButton = $( '<button>', { 'id': 'tdg_add_param', 'class': 'tdg-button-add-param', 'text': mw.message( 'templatedatagenerator-modal-button-addparam' ) } );
+		var addButton = $( '<button>' ).attr( 'id', 'tdg_add_param').addClass( 'tdg-button-add-param' ).text( mw.message( 'templatedatagenerator-modal-button-addparam' ) );
 		addButton.click( function() {
 			//add empty row:
-			var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + pCounter );
+			var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
 			tbl.append( getRow( 'tdg-tr-param', [
-				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pName_' + pCounter, 'value': '' } ) },
-				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pAliases_' + pCounter, 'value': '' } ) },
-				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pLabel_' + pCounter, 'value': '' } ) },
-				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDesc_' + pCounter, 'value': '' } ) },
+				{ html: $( '<input>' ).attr( 'id', 'tdg_pName_' + rowCounter ) },
+				{ html: $( '<input>' ).attr( 'id', 'tdg_pAliases_' + rowCounter ) },
+				{ html: $( '<input>' ).attr( 'id', 'tdg_pLabel_' + rowCounter ) },
+				{ html: $( '<input>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ) },
 				{ html: tSelect },
-				{ html: $( '<input>', { 'type': 'text', 'id': 'tdg_pDefault_' + pCounter, 'value': '' } ) },
-				{ html: $( '<input>', { 'type': 'checkbox', 'id': 'tdg_p_' + pCounter, 'value': 'required' } ) }
+				{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ) },
+				{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ) },
 			] ) );
-			pCounter++;
+			rowCounter++;
 		} );
 		
 		// Build the GUI
@@ -145,7 +145,6 @@ $( document ).ready( function() {
 		
 	} );
 	
-
 	/** Modal Setup **/
 	var i18nModal = function( btnApply, btnCancel ) {
 		var modalButtons = {};
@@ -175,13 +174,12 @@ $( document ).ready( function() {
 
 	/** Methods **/
 	var getRow = function( trClass, tdObj ) {
-		var row = $( '<tr>', { 'class': trClass });
+		var row = $( '<tr>' ).addClass( trClass );
 		tdObj.forEach( function(td) {
 			row.append( $('<td>', td ) );
 		});
 
 		return row;
 	};
-	
 	
 });
