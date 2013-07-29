@@ -1,7 +1,8 @@
 ( function ( $, mw ) {
 	'use strict';
 
-	var jsonTmplData, wikicontent,
+	var i18nModal, getRow,
+		jsonTmplData, wikicontent,
 		textboxParts = [],
 		selOpts = {
 			'undefined': mw.message( 'templatedatagenerator-modal-table-param-type-undefined' ),
@@ -186,7 +187,7 @@
 	} );
 
 	/** Modal Setup **/
-	var i18nModal = function( btnApply, btnCancel, modalBox ) {
+	i18nModal = function( btnApply, btnCancel, modalBox ) {
 		var modalButtons = {};
 
 		modalButtons[btnApply] = function() {
@@ -197,7 +198,7 @@
 			jsonOut.description = $( '.tdg-template-desc' ).val();
 			jsonOut.params = {};
 			// Go over the table:
-			$( '.tdg-editTable tr:gt(0)' ).each( function( index ) {
+			$( '.tdg-editTable tr:gt(0)' ).each( function() {
 				var trID = $( this ).attr( 'data-paramnum' );
 
 				jsonOut.params[ $( '#tdg_pName_' + trID ).val() ] = {
@@ -209,7 +210,8 @@
 				};
 
 				if ( $( '#tdg_pAliases_' + trID ).val() ) {
-					jsonOut.params[ $( '#tdg_pName_' + trID ).val() ].aliases = $( '#tdg_pAliases_' + trID ).val().split(",");
+					jsonOut.params[ $( '#tdg_pName_' + trID ).val() ].aliases =
+						$( '#tdg_pAliases_' + trID ).val().split( ',' );
 				}
 			} );
 
@@ -251,7 +253,7 @@
 	};
 
 	/** Methods **/
-	var getRow = function( trClass, tdObj ) {
+	getRow = function( trClass, tdObj ) {
 		var $row = $( '<tr>' ).addClass( trClass );
 
 		tdObj.forEach( function( td ) {
