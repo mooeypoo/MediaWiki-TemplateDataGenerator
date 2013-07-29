@@ -1,4 +1,4 @@
-$( document ).ready( function ( $, mw ) {
+( function ( $, mw ) {
 	'use strict';
 
 	var jsonTmplData, wikicontent,
@@ -14,7 +14,8 @@ $( document ).ready( function ( $, mw ) {
 		modalBox = $( '.tdg-editscreen-modal-form' );
 
 	$( '.tdg-editscreen-main-button' ).click( function() {
-		var param, sel, $typeSel, $descText, $tbl, $delButton,
+		var param, sel, $typeSel, $descText, $tbl,
+			$addButton, $delButton,
 			pAliases, $tSelect, pDesc, pDefault, reqChecked,
 			newTemplateData = false,
 			error = false;
@@ -135,12 +136,12 @@ $( document ).ready( function ( $, mw ) {
 			}
 
 			// "Add Param" button:
-			var addButton = $( '<button>' )
+			$addButton = $( '<button>' )
 				.attr( 'id', 'tdg_add_param')
 				.addClass( 'tdg-button-add-param' )
 				.text( mw.message( 'templatedatagenerator-modal-button-addparam' ) );
 
-			addButton.click( function() {
+			$addButton.click( function() {
 				var $tSelect, $delButton;
 
 				//add empty row:
