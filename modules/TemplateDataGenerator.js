@@ -1,8 +1,7 @@
 ( function ( $, mw ) {
 	'use strict';
 
-	var i18nModal, getRow,
-		jsonTmplData, wikicontent,
+	var i18nModal, getRow, jsonTmplData, wikicontent,
 		textboxParts = [],
 		selOpts = {
 			'undefined': mw.message( 'templatedatagenerator-modal-table-param-type-undefined' ),
@@ -12,23 +11,29 @@
 			'string/wiki-page-name': mw.message( 'templatedatagenerator-modal-table-param-type-page' )
 		},
 		rowCounter = 0,
-		modalBox = $( '.tdg-editscreen-modal-form' );
+		$modalBox = $( '.tdg-editscreen-modal-form' );
 
 	$( '.tdg-editscreen-main-button' ).click( function () {
-		var param, sel, $typeSel, $descText, $tbl,
+		var param, sel,
+			pAliases, pDesc, pDefault, reqChecked,
+			$typeSel, $descText, $tbl, $tSelect,
 			$addButton, $delButton,
-			pAliases, $tSelect, pDesc, pDefault, reqChecked,
 			newTemplateData = false,
 			error = false;
 
 		// Get the data from the textbox
 		wikicontent = $( '#wpTextbox1' ).val();
 
-		// USE REGEXP to get <templatedata> context
-		textboxParts = wikicontent.match( /(<templatedata>)([\s\S]*?)(<\/templatedata>)/i );
+		// Use regexp to get <templatedata> context
+		textboxParts = wikicontent.match(
+			/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i
+		);
 
 		// See if there was something between the tags:
-		if ( textboxParts && textboxParts[2] && textboxParts[2].trim().length > 0 ) {
+		if ( textboxParts &&
+			textboxParts[2] &&
+			textboxParts[2].trim().length > 0
+		) {
 			textboxParts[2] = textboxParts[2].trim();
 
 			// Parse the json:
@@ -53,7 +58,7 @@
 
 			for ( sel in selOpts ) {
 				$typeSel.append(
-					$( '<option>').prop( 'value', sel ).text( selOpts[ sel ] )
+					$( '<option>' ).prop( 'value', sel ).text( selOpts[ sel ] )
 				);
 			}
 
@@ -84,7 +89,7 @@
 					// Set up the row:
 					pAliases = '';
 					if ( jsonTmplData.params[param].aliases ) {
-						pAliases = jsonTmplData.params[param].aliases.join(',');
+						pAliases = jsonTmplData.params[param].aliases.join( ',' );
 					}
 
 					pDesc = '';
@@ -113,9 +118,11 @@
 						false;
 
 					$delButton = $( '<button>' )
-						.attr( 'id', 'tdg_pButton_' + rowCounter )
+						.attr( {
+							'id': 'tdg_pButton_' + rowCounter,
+							'data-paramnum': rowCounter
+						} )
 						.addClass( 'tdg-param-button-delete' )
-						.attr( 'data-paramnum', rowCounter )
 						.text( mw.message( 'templatedatagenerator-modal-button-delparam' ) )
 						.click( function () {
 							$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
@@ -132,6 +139,7 @@
 						{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ).prop( 'checked', reqChecked ) },
 						{ html: $delButton }
 					] ).attr( 'data-paramnum', rowCounter ) );
+
 					rowCounter++;
 				}
 			}
@@ -145,11 +153,13 @@
 			$addButton.click( function () {
 				var $tSelect, $delButton;
 
-				//add empty row:
+				// add an empty row:
 				$delButton = $( '<button>' )
-					.attr( 'id', 'tdg_pButton_' + rowCounter )
+					.attr( {
+						'id': 'tdg_pButton_' + rowCounter,
+						'data-paramnum': rowCounter
+					} )
 					.addClass( 'tdg-param-button-delete' )
-					.attr( 'data-paramnum', rowCounter )
 					.text( mw.message( 'templatedatagenerator-modal-button-delparam' ) );
 
 				$delButton.click( function () {
@@ -172,22 +182,30 @@
 			} );
 
 			// Build the GUI
-			modalBox.append(
-				$( '<span>' ).addClass( 'tdg-title' ).text( mw.message( 'templatedatagenerator-modal-title-templatedesc' ) ),
+			$modalBox.append(
+				$( '<span>' )
+					.addClass( 'tdg-title' )
+					.text( mw.message( 'templatedatagenerator-modal-title-templatedesc' ) ),
 				$descText,
-				$( '<span>' ).addClass( 'tdg-title' ).text( mw.message( 'templatedatagenerator-modal-title-templateparams' ) ),
+				$( '<span>' )
+					.addClass( 'tdg-title' )
+					.text( mw.message( 'templatedatagenerator-modal-title-templateparams' ) ),
 				$tbl,
 				$addButton
 			);
 
 			// Call the modal:
-			i18nModal( mw.message( 'templatedatagenerator-modal-buttons-apply' ), mw.message( 'templatedatagenerator-modal-buttons-cancel' ), modalBox );
-			modalBox.dialog( 'open' );
+			i18nModal(
+				mw.message( 'templatedatagenerator-modal-buttons-apply' ),
+				mw.message( 'templatedatagenerator-modal-buttons-cancel' ),
+				$modalBox
+			);
+			$modalBox.dialog( 'open' );
 		}
 	} );
 
 	/** Modal Setup **/
-	i18nModal = function ( btnApply, btnCancel, modalBox ) {
+	i18nModal = function ( btnApply, btnCancel, $modalBox ) {
 		var modalButtons = {};
 
 		modalButtons[btnApply] = function () {
@@ -197,6 +215,7 @@
 			// Description:
 			jsonOut.description = $( '.tdg-template-desc' ).val();
 			jsonOut.params = {};
+
 			// Go over the table:
 			$( '.tdg-editTable tr:gt(0)' ).each( function () {
 				var trID = $( this ).attr( 'data-paramnum' );
@@ -231,14 +250,14 @@
 			}
 
 			$( '#wpTextbox1' ).val( finalOutput );
-			modalBox.dialog( 'close' );
+			$modalBox.dialog( 'close' );
 		};
 
 		modalButtons[btnCancel] = function () {
-			modalBox.dialog( 'close' );
+			$modalBox.dialog( 'close' );
 		};
 
-		modalBox.dialog( {
+		$modalBox.dialog( {
 			autoOpen: false,
 			height: window.innerHeight * 0.8,
 			width: window.innerWidth * 0.8,
@@ -246,7 +265,7 @@
 			buttons: modalButtons,
 			close: function () {
 				// Reset:
-				modalBox.empty();
+				$modalBox.empty();
 				rowCounter = 0;
 			}
 		} );
