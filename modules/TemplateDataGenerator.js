@@ -101,7 +101,7 @@
 					}
 
 					// Type:
-					$tSelect = $typeSel.clone().attr( 'id', 'tdc_pType_' + rowCounter );
+					$tSelect = $typeSel.clone().attr( 'id', 'tdg_pType_' + rowCounter );
 					if ( jsonTmplData.params[param].type ) {
 						$tSelect.val( jsonTmplData.params[param].type );
 					} else {
@@ -166,7 +166,7 @@
 					$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
 				} );
 
-				$tSelect = $typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
+				$tSelect = $typeSel.clone().attr('id', 'tdg_pType_' + rowCounter );
 				$tbl.append( getRow( 'tdg-tr-param tdg-paramcount-' + rowCounter, [
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pName_' + rowCounter ) },
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pAliases_' + rowCounter ) },
@@ -218,18 +218,28 @@
 
 			// Go over the table:
 			$( '.tdg-editTable tr:gt(0)' ).each( function () {
-				var trID = $( this ).attr( 'data-paramnum' );
+				var trID = $( this ).attr( 'data-paramnum' ),
+					paramName = $( '#tdg_pName_' + trID ).val();
 
-				jsonOut.params[ $( '#tdg_pName_' + trID ).val() ] = {
-					'label': $( '#tdg_pLabel_' + trID ).val(),
-					'type': $( '#tdg_pType_' + trID ).val(),
-					'description': $( '#tdg_pDesc_' + trID ).val(),
-					'required': $( '#tdg_pRequired_' + trID ).val(),
-					'default': $( '#tdg_pDefault_' + trID ).val()
-				};
+				jsonOut.params[ paramName ] = {};
+
+				if ( jsonTmplData.params[ paramName ] ) { 
+					// Try to preserve the structure of the original JSON
+					// Merge the properties of the json parameter even if they're not
+					// supported in the GUI for the moment
+					$.extend( jsonOut.params[ paramName ], jsonTmplData.params[ paramName ] );
+				}
+
+				// Override with the edited values:
+				console.log( $( '#tdg_pType_' + trID ).val() );
+				jsonOut.params[ paramName ].label = $( '#tdg_pLabel_' + trID ).val();
+				jsonOut.params[ paramName ]['type'] = $( '#tdg_pType_' + trID ).val();
+				jsonOut.params[ paramName ].description = $( '#tdg_pDesc_' + trID ).val();
+				jsonOut.params[ paramName ].required = $( '#tdg_pRequired_' + trID ).val();
+				jsonOut.params[ paramName ]['default'] = $( '#tdg_pDefault_' + trID ).val();
 
 				if ( $( '#tdg_pAliases_' + trID ).val() ) {
-					jsonOut.params[ $( '#tdg_pName_' + trID ).val() ].aliases =
+					jsonOut.params[ paramName ].aliases =
 						$( '#tdg_pAliases_' + trID ).val().split( ',' );
 				}
 			} );
