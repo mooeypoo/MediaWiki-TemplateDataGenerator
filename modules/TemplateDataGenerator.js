@@ -14,7 +14,7 @@
 		rowCounter = 0,
 		modalBox = $( '.tdg-editscreen-modal-form' );
 
-	$( '.tdg-editscreen-main-button' ).click( function() {
+	$( '.tdg-editscreen-main-button' ).click( function () {
 		var param, sel, $typeSel, $descText, $tbl,
 			$addButton, $delButton,
 			pAliases, $tSelect, pDesc, pDefault, reqChecked,
@@ -117,7 +117,7 @@
 						.addClass( 'tdg-param-button-delete' )
 						.attr( 'data-paramnum', rowCounter )
 						.text( mw.message( 'templatedatagenerator-modal-button-delparam' ) )
-						.click( function() {
+						.click( function () {
 							$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
 						} );
 
@@ -142,7 +142,7 @@
 				.addClass( 'tdg-button-add-param' )
 				.text( mw.message( 'templatedatagenerator-modal-button-addparam' ) );
 
-			$addButton.click( function() {
+			$addButton.click( function () {
 				var $tSelect, $delButton;
 
 				//add empty row:
@@ -152,7 +152,7 @@
 					.attr( 'data-paramnum', rowCounter )
 					.text( mw.message( 'templatedatagenerator-modal-button-delparam' ) );
 
-				$delButton.click( function() {
+				$delButton.click( function () {
 					$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
 				} );
 
@@ -187,10 +187,10 @@
 	} );
 
 	/** Modal Setup **/
-	i18nModal = function( btnApply, btnCancel, modalBox ) {
+	i18nModal = function ( btnApply, btnCancel, modalBox ) {
 		var modalButtons = {};
 
-		modalButtons[btnApply] = function() {
+		modalButtons[btnApply] = function () {
 			var jsonOut = {},
 				finalOutput = '';
 
@@ -198,7 +198,7 @@
 			jsonOut.description = $( '.tdg-template-desc' ).val();
 			jsonOut.params = {};
 			// Go over the table:
-			$( '.tdg-editTable tr:gt(0)' ).each( function() {
+			$( '.tdg-editTable tr:gt(0)' ).each( function () {
 				var trID = $( this ).attr( 'data-paramnum' );
 
 				jsonOut.params[ $( '#tdg_pName_' + trID ).val() ] = {
@@ -234,7 +234,7 @@
 			modalBox.dialog( 'close' );
 		};
 
-		modalButtons[btnCancel] = function() {
+		modalButtons[btnCancel] = function () {
 			modalBox.dialog( 'close' );
 		};
 
@@ -244,7 +244,7 @@
 			width: window.innerWidth * 0.8,
 			modal: true,
 			buttons: modalButtons,
-			close: function() {
+			close: function () {
 				// Reset:
 				modalBox.empty();
 				rowCounter = 0;
@@ -253,10 +253,10 @@
 	};
 
 	/** Methods **/
-	getRow = function( trClass, tdObj ) {
+	getRow = function ( trClass, tdObj ) {
 		var $row = $( '<tr>' ).addClass( trClass );
 
-		tdObj.forEach( function( td ) {
+		tdObj.forEach( function ( td ) {
 			$row.append( $( '<td>', td ) );
 		} );
 
