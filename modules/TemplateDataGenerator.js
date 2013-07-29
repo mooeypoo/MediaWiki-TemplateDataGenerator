@@ -4,11 +4,11 @@
 	var i18nModal, getRow, jsonTmplData, wikicontent,
 		textboxParts = [],
 		selOpts = {
-			'undefined': mw.message( 'templatedatagenerator-modal-table-param-type-undefined' ),
-			'number': mw.message( 'templatedatagenerator-modal-table-param-type-number' ),
-			'string': mw.message( 'templatedatagenerator-modal-table-param-type-string' ),
-			'string/wiki-user-name': mw.message( 'templatedatagenerator-modal-table-param-type-user' ),
-			'string/wiki-page-name': mw.message( 'templatedatagenerator-modal-table-param-type-page' )
+			'undefined': mw.msg( 'templatedatagenerator-modal-table-param-type-undefined' ),
+			'number': mw.msg( 'templatedatagenerator-modal-table-param-type-number' ),
+			'string': mw.msg( 'templatedatagenerator-modal-table-param-type-string' ),
+			'string/wiki-user-name': mw.msg( 'templatedatagenerator-modal-table-param-type-user' ),
+			'string/wiki-page-name': mw.msg( 'templatedatagenerator-modal-table-param-type-page' )
 		},
 		rowCounter = 0,
 		$modalBox = $( '.tdg-editscreen-modal-form' );
@@ -32,9 +32,9 @@
 		// See if there was something between the tags:
 		if ( textboxParts &&
 			textboxParts[2] &&
-			textboxParts[2].trim().length > 0
+			$.trim( textboxParts[2] ).length > 0
 		) {
-			textboxParts[2] = textboxParts[2].trim();
+			textboxParts[2] = $.trim( textboxParts[2] );
 
 			// Parse the json:
 			try {
@@ -42,7 +42,7 @@
 			} catch ( err ) {
 				// oops, JSON isn't proper.
 				// TODO: Tell the user the JSON isn't right
-				$( '.tdg-editscreen-error-msg' ).text( mw.message( 'templatedatagenerator-errormsg-jsonbadformat' ) );
+				$( '.tdg-editscreen-error-msg' ).text( mw.msg( 'templatedatagenerator-errormsg-jsonbadformat' ) );
 				error = true;
 			}
 		} else {
@@ -72,14 +72,14 @@
 
 			// Param Table:
 			$tbl = $( '<table>').addClass( 'tdg-editTable' ).append( getRow( 'tdg-tr-head', [
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-name' ) },
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-aliases' ) },
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-label' ) },
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-desc' ) },
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-type' ) },
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-default' ) },
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-required' ) },
-				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-actions' ) }
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-name' ) },
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-aliases' ) },
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-label' ) },
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-desc' ) },
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-type' ) },
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-default' ) },
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-required' ) },
+				{ 'text': mw.msg( 'templatedatagenerator-modal-table-param-actions' ) }
 			] ) );
 
 			// Add existing parameters:
@@ -123,7 +123,7 @@
 							'data-paramnum': rowCounter
 						} )
 						.addClass( 'tdg-param-button-delete' )
-						.text( mw.message( 'templatedatagenerator-modal-button-delparam' ) )
+						.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
 						.click( function () {
 							$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
 						} );
@@ -148,7 +148,7 @@
 			$addButton = $( '<button>' )
 				.attr( 'id', 'tdg_add_param')
 				.addClass( 'tdg-button-add-param' )
-				.text( mw.message( 'templatedatagenerator-modal-button-addparam' ) );
+				.text( mw.msg( 'templatedatagenerator-modal-button-addparam' ) );
 
 			$addButton.click( function () {
 				var $tSelect, $delButton;
@@ -160,7 +160,7 @@
 						'data-paramnum': rowCounter
 					} )
 					.addClass( 'tdg-param-button-delete' )
-					.text( mw.message( 'templatedatagenerator-modal-button-delparam' ) );
+					.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) );
 
 				$delButton.click( function () {
 					$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
@@ -185,19 +185,19 @@
 			$modalBox.append(
 				$( '<span>' )
 					.addClass( 'tdg-title' )
-					.text( mw.message( 'templatedatagenerator-modal-title-templatedesc' ) ),
+					.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) ),
 				$descText,
 				$( '<span>' )
 					.addClass( 'tdg-title' )
-					.text( mw.message( 'templatedatagenerator-modal-title-templateparams' ) ),
+					.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) ),
 				$tbl,
 				$addButton
 			);
 
 			// Call the modal:
 			i18nModal(
-				mw.message( 'templatedatagenerator-modal-buttons-apply' ),
-				mw.message( 'templatedatagenerator-modal-buttons-cancel' ),
+				mw.msg( 'templatedatagenerator-modal-buttons-apply' ),
+				mw.msg( 'templatedatagenerator-modal-buttons-cancel' ),
 				$modalBox
 			);
 			$modalBox.dialog( 'open' );
