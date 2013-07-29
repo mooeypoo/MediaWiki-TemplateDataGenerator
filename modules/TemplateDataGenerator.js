@@ -1,14 +1,13 @@
 $( document ).ready( function() {
-	var jsonTmplData, param, wikicontent, textboxParts = [];
-	// TODO: i18n messages for the labels of selOpts
-	var selOpts = {
+	var jsonTmplData, param, wikicontent, textboxParts = [],
+		selOpts = {
 			'undefined': mw.message( 'templatedatagenerator-modal-table-param-type-undefined' ),
 			'number': mw.message( 'templatedatagenerator-modal-table-param-type-number' ),
 			'string': mw.message( 'templatedatagenerator-modal-table-param-type-string' ),
 			'string/wiki-user-name': mw.message( 'templatedatagenerator-modal-table-param-type-user' ),
-			'string/wiki-page-name': mw.message( 'templatedatagenerator-modal-table-param-type-page' ),
-		};
-	var rowCounter = 0;
+			'string/wiki-page-name': mw.message( 'templatedatagenerator-modal-table-param-type-page' )
+		},
+		rowCounter = 0;
 
 	$('.tdg-editscreen-main-button').click( function() {
 		var newTemplateData = false, error = false;
@@ -40,7 +39,7 @@ $( document ).ready( function() {
 			// Create "type" selectbox:
 			var typeSel = $( '<select>' );
 			typeSel.append( $( '<option>' ) );
-			for (sel in selOpts) {
+			for (var sel in selOpts) {
 				typeSel.append( $( '<option>').prop( 'value', sel ).text( selOpts[ sel ] ) );
 			}
 
@@ -60,12 +59,12 @@ $( document ).ready( function() {
 					{ 'text': mw.message( 'templatedatagenerator-modal-table-param-type' ) },
 					{ 'text': mw.message( 'templatedatagenerator-modal-table-param-default' ) },
 					{ 'text': mw.message( 'templatedatagenerator-modal-table-param-required' ) },
-					{ 'text': mw.message( 'templatedatagenerator-modal-table-param-actions' ) },
+					{ 'text': mw.message( 'templatedatagenerator-modal-table-param-actions' ) }
 				] ) );
 
 			// Add existing parameters:
 			if ( !newTemplateData && jsonTmplData && jsonTmplData.params ) {
-				var pAliases = '';
+				var pAliases = '', tSelect;
 				for ( param in jsonTmplData.params ) {
 
 					// Set up the row:
@@ -83,7 +82,7 @@ $( document ).ready( function() {
 					}
 
 					// Type:
-					var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
+					tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
 					if ( jsonTmplData.params[param].type ) {
 						tSelect.val( jsonTmplData.params[param].type );
 					} else {
@@ -105,7 +104,7 @@ $( document ).ready( function() {
 						{ html: $( '<input>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ).val( pDesc ) },
 						{ html: tSelect },
 						{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ).val( pDefault ) },
-						{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ).prop( 'checked', reqChecked ) },
+						{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ).prop( 'checked', reqChecked ) }
 					] ) );
 					rowCounter++;
 				}
@@ -123,7 +122,7 @@ $( document ).ready( function() {
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ) },
 					{ html: tSelect },
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ) },
-					{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ) },
+					{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ) }
 				] ) );
 				rowCounter++;
 			} );
@@ -157,7 +156,7 @@ $( document ).ready( function() {
 					'type': $( '#tdg_pType_' + index ).val(),
 					'description': $( '#tdg_pDesc_' + index ).val(),
 					'required': $( '#tdg_pRequired_' + index ).val(),
-					'default': $( '#tdg_pDefault_' + index ).val(),
+					'default': $( '#tdg_pDefault_' + index ).val()
 				};
 				if ( $( '#tdg_pAliases_' + index ).val() ) {
 					jsonOut.params[ $( '#tdg_pName_' + index ).val() ].aliases = $( '#tdg_pAliases_' + index ).val().split(",");
@@ -173,7 +172,6 @@ $( document ).ready( function() {
 				// otherwise, put this at the end of the text:
 				finalOutput = wikicontent + '\n<templatedata>\n' + JSON.stringify( jsonOut, null, '	' ) + '\n</templatedata>';
 			}
-			console.log( finalOutput );
 			$( '#wpTextbox1' ).val( finalOutput );
 			$( '.tdg-editscreen-modal-form' ).dialog( 'close' );
 		};
