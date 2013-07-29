@@ -43,7 +43,6 @@ $templdatagenResourceTemplate = array(
 $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate + array(
 	'styles' => 'modules/TemplateDataGenerator.css',
 	'scripts' => 'modules/TemplateDataGenerator.js',
-	'position' => 'top',
 	'dependencies' => array(
 		'jquery.ui.dialog'
 	),
@@ -71,4 +70,3 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 		'templatedatagenerator-modal-buttons-cancel',
 	)
 );
-
