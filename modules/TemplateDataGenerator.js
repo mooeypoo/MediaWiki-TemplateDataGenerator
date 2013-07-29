@@ -1,31 +1,30 @@
 $( document ).ready( function() {
-	var jsonTmplData;
+	var jsonTmplData, param, wikicontent, textboxParts = [];
 	// TODO: i18n messages for the labels of selOpts
 	var selOpts = {
-			'undefined': 'Unknown',
-			'number': 'Number',
-			'string': 'String',
-			'string/wiki-user-name': 'User',
-			'string/wiki-page-name': 'Page',
+			'undefined': mw.message( 'templatedatagenerator-modal-table-param-type-undefined' ),
+			'number': mw.message( 'templatedatagenerator-modal-table-param-type-number' ),
+			'string': mw.message( 'templatedatagenerator-modal-table-param-type-string' ),
+			'string/wiki-user-name': mw.message( 'templatedatagenerator-modal-table-param-type-user' ),
+			'string/wiki-page-name': mw.message( 'templatedatagenerator-modal-table-param-type-page' ),
 		};
 	var rowCounter = 0;
 
 	$('.tdg-editscreen-main-button').click( function() {
-		var wikicontent, tdata,
-			newTemplateData = false;
+		var newTemplateData = false;
 
 		// Get the data from the textbox
-		wikicontent = $('#wpTextbox1').val();
+		wikicontent = $( '#wpTextbox1' ).val();
 
 		// USE REGEXP to get <templatedata> context
-		tdata = wikicontent.match( /(<templatedata>)([\s\S]*?)(<\/templatedata>)/i );
+		textboxParts = wikicontent.match( /(<templatedata>)([\s\S]*?)(<\/templatedata>)/i );
 
 		// See if there was something between the tags:
-		if ( tdata && tdata[2] && tdata[2].trim().length > 0 ) {
-			tdata[2] = tdata[2].trim();
+		if ( textboxParts && textboxParts[2] && textboxParts[2].trim().length > 0 ) {
+			textboxParts[2] = textboxParts[2].trim();
 			// Parse the json:
 			try {
-				jsonTmplData = $.parseJSON(tdata[2]);
+				jsonTmplData = $.parseJSON( textboxParts[2] );
 			} catch ( err ) {
 				// oops, JSON isn't proper.
 				// TODO: Tell the user the JSON isn't right
@@ -37,7 +36,7 @@ $( document ).ready( function() {
 		}
 
 		/** Create GUI **/
-		$( '#dialog-form' ).empty(); //reset
+//		$( '#dialog-form' ).empty(); //reset
 		// Create "type" selectbox:
 		var typeSel = $( '<select>' );
 		typeSel.append( $( '<option>' ) );
@@ -67,7 +66,7 @@ $( document ).ready( function() {
 		// Add existing parameters:
 		if ( !newTemplateData && jsonTmplData && jsonTmplData.params ) {
 			var pAliases = '';
-			for (param in jsonTmplData.params) {
+			for ( param in jsonTmplData.params ) {
 
 				// Set up the row:
 				pAliases = '';
@@ -76,11 +75,11 @@ $( document ).ready( function() {
 				}
 
 				pDesc = '';
-				if ( typeof jsonTmplData.params[param].description === 'object' ) {
+				if ( typeof jsonTmplData.params[param].description === 'string' ) {
+					pDesc = jsonTmplData.params[param].description;
+				} else {
 					// TODO:
 					// work with description that has languages
-				} else {
-					pDesc = jsonTmplData.params[param].description;
 				}
 
 				// Type:
@@ -96,7 +95,7 @@ $( document ).ready( function() {
 					pDefault = jsonTmplData.params[param]['default'];
 				}
 
-				reqChecked = ( typeof jsonTmplData.params[param].required !== 'undefined' ) ? jsonTmplData.params[param].required: false;
+				reqChecked = ( jsonTmplData.params[param].required !== undefined ) ? jsonTmplData.params[param].required: false;
 
 				// Add row:
 				tbl.append( getRow( 'tdg-tr-param', [
@@ -110,7 +109,6 @@ $( document ).ready( function() {
 				] ) );
 				rowCounter++;
 			}
-			console.log(jsonTmplData.params);
 		}
 
 		// "Add Param" button:
@@ -131,7 +129,7 @@ $( document ).ready( function() {
 		} );
 
 		// Build the GUI
-		$( '#dialog-form' )
+		$( '.tdg-editscreen-modal-form' )
 			.append( $( '<span>', { 'class': 'tdg-title', 'text': mw.message( 'templatedatagenerator-modal-title-templatedesc' ) }) )
 			.append( descText )
 			.append( $( '<span>', { 'class': 'tdg-title', 'text': mw.message( 'templatedatagenerator-modal-title-templateparams' ) }) )
@@ -141,34 +139,61 @@ $( document ).ready( function() {
 		// Call the modal:
 		i18nModal( mw.message( 'templatedatagenerator-modal-buttons-apply' ), mw.message( 'templatedatagenerator-modal-buttons-cancel' ) );
 
-
-
 	} );
 
 	/** Modal Setup **/
 	var i18nModal = function( btnApply, btnCancel ) {
 		var modalButtons = {};
 		modalButtons[btnApply] = function() {
-			// TODO: Apply JSON changes
-			console.log( jsonTmplData );
-			$( '#dialog-form' ).dialog( 'close' );
+			var jsonOut = {};
+			// Description:
+			jsonOut.description = $( '.tdg-template-desc' ).text();
+			jsonOut.params = {};
+			// Go over the table:
+			$( '.tdg-editTable tr:gt(0)' ).each( function( index ) {
+				jsonOut.params[ $( '#tdg_pName_' + index ).val() ] = {
+					'label': $( '#tdg_pLabel_' + index ).val(),
+					'type': $( '#tdg_pType_' + index ).val(),
+					'description': $( '#tdg_pDesc_' + index ).val(),
+					'required': $( '#tdg_pRequired_' + index ).val(),
+					'default': $( '#tdg_pDefault_' + index ).val(),
+				};
+				if ( $( '#tdg_pAliases_' + index ).val() ) {
+					jsonOut.params[ $( '#tdg_pName_' + index ).val() ].aliases = $( '#tdg_pAliases_' + index ).val().split(",");
+				}
+			} );
+			
+			// Now return jsonOut to the textbox:
+			var finalOutput = '';
+			if ( textboxParts && textboxParts[2] ) {
+				// put the json back where the tags were:
+				finalOutput = wikicontent.replace( /(<templatedata>)([\s\S]*?)(<\/templatedata>)/i, '<templatedata>\n' + JSON.stringify( jsonOut, null, '	' ) + '\n</templatedata>' );
+			} else {
+				// otherwise, put this at the end of the text:
+				finalOutput = wikicontent + '\n<templatedata>\n' + JSON.stringify( jsonOut, null, '	' ) + '\n</templatedata>';
+			}
+			console.log( finalOutput );
+			$( '#wpTextbox1' ).val( finalOutput );
+			$( '.tdg-editscreen-modal-form' ).dialog( 'close' );
 		};
 		modalButtons[btnCancel] = function() {
-			$( '#dialog-form' ).dialog( 'close' );
+			$( '.tdg-editscreen-modal-form' ).dialog( 'close' );
 		};
 
-		$( '#dialog-form' ).dialog({
+		$( '.tdg-editscreen-modal-form' ).dialog({
 			autoOpen: false,
 			height: window.innerHeight * 0.8,
 			width: window.innerWidth * 0.8,
 			modal: true,
 			buttons: modalButtons,
 			close: function() {
-				$(this).dialog( 'close' );
+				// Reset:
+				$( '.tdg-editscreen-modal-form' ).empty();
+				rowCounter = 0;
 			}
 		});
 
-		$( '#dialog-form' ).dialog( 'open' );
+		$( '.tdg-editscreen-modal-form' ).dialog( 'open' );
 
 	};
 
