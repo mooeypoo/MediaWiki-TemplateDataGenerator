@@ -8,18 +8,18 @@ $( document ).ready( function() {
 			'string/wiki-user-name': 'User',
 			'string/wiki-page-name': 'Page',
 		};
-	var rowCounter = 0; 
+	var rowCounter = 0;
 
-	$('.tdg-editscreen-main-button').click( function() { 
+	$('.tdg-editscreen-main-button').click( function() {
 		var wikicontent, tdata,
 			newTemplateData = false;
-		
-		// Get the data from the textbox		
+
+		// Get the data from the textbox
 		wikicontent = $('#wpTextbox1').val();
-		
+
 		// USE REGEXP to get <templatedata> context
 		tdata = wikicontent.match( /(<templatedata>)([\s\S]*?)(<\/templatedata>)/i );
-		
+
 		// See if there was something between the tags:
 		if ( tdata && tdata[2] && tdata[2].trim().length > 0 ) {
 			tdata[2] = tdata[2].trim();
@@ -27,7 +27,7 @@ $( document ).ready( function() {
 			try {
 				jsonTmplData = $.parseJSON(tdata[2]);
 			} catch ( err ) {
-				// oops, JSON isn't proper. 
+				// oops, JSON isn't proper.
 				// TODO: Tell the user the JSON isn't right
 				console.log( "JSON Parse Error.");
 			}
@@ -35,7 +35,7 @@ $( document ).ready( function() {
 			// No <templatedata> tags found. This is new.
 			newTemplateData = true;
 		}
-		
+
 		/** Create GUI **/
 		$( '#dialog-form' ).empty(); //reset
 		// Create "type" selectbox:
@@ -50,10 +50,10 @@ $( document ).ready( function() {
 		if ( !newTemplateData && jsonTmplData && jsonTmplData.description ) {
 			descText.html( jsonTmplData.description );
 		}
-		
+
 		// Param Table:
 		var tbl = $( '<table>', { 'class': 'tdg-editTable' } ).append( getRow( 'tdg-tr-head',
-			[ 
+			[
 				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-name' ) },
 				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-aliases' ) },
 				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-label' ) },
@@ -63,26 +63,26 @@ $( document ).ready( function() {
 				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-required' ) },
 				{ 'text': mw.message( 'templatedatagenerator-modal-table-param-actions' ) },
 			] ) );
-		
+
 		// Add existing parameters:
 		if ( !newTemplateData && jsonTmplData && jsonTmplData.params ) {
 			var pAliases = '';
 			for (param in jsonTmplData.params) {
-				
+
 				// Set up the row:
 				pAliases = '';
 				if ( jsonTmplData.params[param].aliases ) {
 					pAliases = jsonTmplData.params[param].aliases.join(',');
 				}
-				
+
 				pDesc = '';
 				if ( typeof jsonTmplData.params[param].description === 'object' ) {
-					// TODO: 
+					// TODO:
 					// work with description that has languages
 				} else {
 					pDesc = jsonTmplData.params[param].description;
 				}
-				
+
 				// Type:
 				var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
 				if ( jsonTmplData.params[param].type ) {
@@ -95,7 +95,7 @@ $( document ).ready( function() {
 				if ( jsonTmplData.params[param]['default'] ) {
 					pDefault = jsonTmplData.params[param]['default'];
 				}
-				
+
 				reqChecked = ( typeof jsonTmplData.params[param].required !== 'undefined' ) ? jsonTmplData.params[param].required: false;
 
 				// Add row:
@@ -112,7 +112,7 @@ $( document ).ready( function() {
 			}
 			console.log(jsonTmplData.params);
 		}
-		
+
 		// "Add Param" button:
 		var addButton = $( '<button>' ).attr( 'id', 'tdg_add_param').addClass( 'tdg-button-add-param' ).text( mw.message( 'templatedatagenerator-modal-button-addparam' ) );
 		addButton.click( function() {
@@ -129,7 +129,7 @@ $( document ).ready( function() {
 			] ) );
 			rowCounter++;
 		} );
-		
+
 		// Build the GUI
 		$( '#dialog-form' )
 			.append( $( '<span>', { 'class': 'tdg-title', 'text': mw.message( 'templatedatagenerator-modal-title-templatedesc' ) }) )
@@ -137,14 +137,14 @@ $( document ).ready( function() {
 			.append( $( '<span>', { 'class': 'tdg-title', 'text': mw.message( 'templatedatagenerator-modal-title-templateparams' ) }) )
 			.append( tbl )
 			.append( addButton );
-		
+
 		// Call the modal:
 		i18nModal( mw.message( 'templatedatagenerator-modal-buttons-apply' ), mw.message( 'templatedatagenerator-modal-buttons-cancel' ) );
 
 
-		
+
 	} );
-	
+
 	/** Modal Setup **/
 	var i18nModal = function( btnApply, btnCancel ) {
 		var modalButtons = {};
@@ -156,7 +156,7 @@ $( document ).ready( function() {
 		modalButtons[btnCancel] = function() {
 			$( '#dialog-form' ).dialog( 'close' );
 		};
-		
+
 		$( '#dialog-form' ).dialog({
 			autoOpen: false,
 			height: window.innerHeight * 0.8,
@@ -167,9 +167,9 @@ $( document ).ready( function() {
 				$(this).dialog( 'close' );
 			}
 		});
-		
+
 		$( '#dialog-form' ).dialog( 'open' );
-			
+
 	};
 
 	/** Methods **/
@@ -181,5 +181,5 @@ $( document ).ready( function() {
 
 		return row;
 	};
-	
+
 });
