@@ -23,4 +23,9 @@
 
 .tdg-editTable tr {
 	border: 1px solid;
+	vertical-align: top;
+}
+
+.tdg-editTable td {
+	border-bottom: 1px dashed #333333;
 }

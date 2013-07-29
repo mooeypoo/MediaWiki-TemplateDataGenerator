@@ -1,5 +1,5 @@
 $( document ).ready( function() {
-	var jsonTmplData, param, wikicontent, textboxParts = [],
+	var jsonTmplData, wikicontent, textboxParts = [],
 		selOpts = {
 			'undefined': mw.message( 'templatedatagenerator-modal-table-param-type-undefined' ),
 			'number': mw.message( 'templatedatagenerator-modal-table-param-type-number' ),
@@ -10,7 +10,7 @@ $( document ).ready( function() {
 		rowCounter = 0;
 
 	$('.tdg-editscreen-main-button').click( function() {
-		var newTemplateData = false, error = false;
+		var param, newTemplateData = false, error = false;
 
 		// Get the data from the textbox
 		wikicontent = $( '#wpTextbox1' ).val();
@@ -39,7 +39,7 @@ $( document ).ready( function() {
 			// Create "type" selectbox:
 			var typeSel = $( '<select>' );
 			typeSel.append( $( '<option>' ) );
-			for (var sel in selOpts) {
+			for ( var sel in selOpts ) {
 				typeSel.append( $( '<option>').prop( 'value', sel ).text( selOpts[ sel ] ) );
 			}
 
@@ -50,7 +50,7 @@ $( document ).ready( function() {
 			}
 
 			// Param Table:
-			var tbl = $( '<table>', { 'class': 'tdg-editTable' } ).append( getRow( 'tdg-tr-head',
+			var tbl = $( '<table>').addClass( 'tdg-editTable' ).append( getRow( 'tdg-tr-head',
 				[
 					{ 'text': mw.message( 'templatedatagenerator-modal-table-param-name' ) },
 					{ 'text': mw.message( 'templatedatagenerator-modal-table-param-aliases' ) },
@@ -82,7 +82,7 @@ $( document ).ready( function() {
 					}
 
 					// Type:
-					tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
+					tSelect = typeSel.clone().attr( 'id', 'tdc_pType_' + rowCounter );
 					if ( jsonTmplData.params[param].type ) {
 						tSelect.val( jsonTmplData.params[param].type );
 					} else {
@@ -96,15 +96,22 @@ $( document ).ready( function() {
 
 					reqChecked = ( jsonTmplData.params[param].required !== undefined ) ? jsonTmplData.params[param].required: false;
 
+					var delButton = $( '<button>' ).attr( 'id', 'tdg_pButton_' + rowCounter ).addClass( 'tdg-param-button-delete' ).attr( 'data-paramnum', rowCounter ).text( mw.message( 'templatedatagenerator-modal-button-delparam' ) );
+					delButton.click( function() {
+						$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
+		//				$( this ).closest( 'tr' ).get( 0 ).remove();
+					} );
+
 					// Add row:
-					tbl.append( getRow( 'tdg-tr-param', [
+					tbl.append( getRow( 'tdg-tr-param tdg-paramcount-' + rowCounter, [
 						{ html: $( '<input>' ).attr( 'id', 'tdg_pName_' + rowCounter ).val( param ) },
 						{ html: $( '<input>' ).attr( 'id', 'tdg_pAliases_' + rowCounter ).val( pAliases ) },
 						{ html: $( '<input>' ).attr( 'id', 'tdg_pLabel_' + rowCounter ).val( jsonTmplData.params[param].label ) },
-						{ html: $( '<input>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ).val( pDesc ) },
+						{ html: $( '<textarea>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ).val( pDesc ) },
 						{ html: tSelect },
 						{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ).val( pDefault ) },
-						{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ).prop( 'checked', reqChecked ) }
+						{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ).prop( 'checked', reqChecked ) },
+						{ html: delButton }
 					] ) );
 					rowCounter++;
 				}
@@ -115,23 +122,24 @@ $( document ).ready( function() {
 			addButton.click( function() {
 				//add empty row:
 				var tSelect = typeSel.clone().attr('id', 'tdc_pType_' + rowCounter );
-				tbl.append( getRow( 'tdg-tr-param', [
+				tbl.append( getRow( 'tdg-tr-param tdg-paramcount-' + rowCounter, [
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pName_' + rowCounter ) },
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pAliases_' + rowCounter ) },
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pLabel_' + rowCounter ) },
-					{ html: $( '<input>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ) },
+					{ html: $( '<textarea>' ).attr( 'id', 'tdg_pDesc_' + rowCounter ) },
 					{ html: tSelect },
 					{ html: $( '<input>' ).attr( 'id', 'tdg_pDefault_' + rowCounter ) },
-					{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ) }
+					{ html: $( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + rowCounter ) },
+					{ html: delButton }
 				] ) );
 				rowCounter++;
 			} );
 
 			// Build the GUI
 			$( '.tdg-editscreen-modal-form' )
-				.append( $( '<span>', { 'class': 'tdg-title', 'text': mw.message( 'templatedatagenerator-modal-title-templatedesc' ) }) )
+				.append( $( '<span>' ).addClass( 'tdg-title' ).text( mw.message( 'templatedatagenerator-modal-title-templatedesc' ) ) )
 				.append( descText )
-				.append( $( '<span>', { 'class': 'tdg-title', 'text': mw.message( 'templatedatagenerator-modal-title-templateparams' ) }) )
+				.append( $( '<span>' ).addClass( 'tdg-title' ).text( mw.message( 'templatedatagenerator-modal-title-templateparams' ) ) )
 				.append( tbl )
 				.append( addButton );
 

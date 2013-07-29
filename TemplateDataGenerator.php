@@ -66,6 +66,7 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 		'templatedatagenerator-modal-table-param-required',
 		'templatedatagenerator-modal-table-param-actions',
 		'templatedatagenerator-modal-button-addparam',
+		'templatedatagenerator-modal-button-delparam',
 		'templatedatagenerator-modal-buttons-apply',
 		'templatedatagenerator-modal-buttons-cancel',
 	)
