@@ -25,11 +25,6 @@ class TemplateDataGeneratorHooks {
 		# Add modules
 		$wgOut->addModules( 'ext.templateDataGenerator' );
 
-		# Add 'Edit/Generate TemplateData' Button:
-		$editPage->editFormPageTop .= '<div class="tdg-editscreen-error-msg"></div>';
-		$editPage->editFormPageTop .= '<button class="tdg-editscreen-main-button">' . wfMessage( 'templatedatagenerator-editbutton' )->text() . '</button>';
-		$editPage->editFormPageTop .= '<div class="tdg-editscreen-modal-form" id="dialog-form" style="display:none;" title="' . wfMessage( 'templatedatagenerator-modal-title' )->text() . '"> </div>';
-
 		return true;
 	}
 

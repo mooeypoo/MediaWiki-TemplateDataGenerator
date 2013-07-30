@@ -42,12 +42,16 @@ $templdatagenResourceTemplate = array(
 # Modules:
 $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate + array(
 	'styles' => 'modules/TemplateDataGenerator.css',
-	'scripts' => 'modules/TemplateDataGenerator.js',
+	'scripts' => array( 
+		'modules/TemplateDataGenerator.core.js',
+		'modules/TemplateDataGenerator.editPage.js'
+	),
 	'dependencies' => array(
 		'jquery.ui.dialog'
 	),
 	'messages' => array(
 		'templatedatagenerator-modal-title',
+		'templatedatagenerator-editbutton',
 		'templatedatagenerator-errormsg-jsonbadformat',
 		'templatedatagenerator-modal-title-templatedesc',
 		'templatedatagenerator-modal-title-templateparams',
