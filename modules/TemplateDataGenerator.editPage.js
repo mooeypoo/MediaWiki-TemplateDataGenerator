@@ -1,8 +1,11 @@
 ( function ( $, mw ) {
 	'use strict';
-	
-	var mTemplateData = TemplateDataGenerator;
-	mTemplateData.init();
+
+	// Check if there's an editor textarea:
+	if ( $( '#wpTextbox1' ).length > 0 ) {
+		var mTemplateData = TemplateDataGenerator;
+		mTemplateData.init();
+	}
 
 	$( '.tdg-editscreen-main-button' ).click( function () {
 		var $modalBox = TemplateDataGenerator.createModal();

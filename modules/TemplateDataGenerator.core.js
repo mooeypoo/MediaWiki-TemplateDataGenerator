@@ -100,12 +100,12 @@ var TemplateDataGenerator = (function( ) {
 
 			// Go over the table:
 			$( '.tdg-editTable tr:gt(0)' ).each( function () {
-				var trID = $( this ).attr( 'data-paramnum' ),
+				var trID = $( this ).data( 'data-paramnum' ),
 					paramName = $( '#tdg_pName_' + trID ).val();
 
 				jsonOut.params[ paramName ] = {};
 
-				if ( jsonTmplData.params[ paramName ] ) { 
+				if ( !newTemplateData && jsonTmplData && jsonTmplData.params && jsonTmplData.params[ paramName ] ) { 
 					// Try to preserve the structure of the original JSON
 					// Merge the properties of the json parameter even if they're not
 					// supported in the GUI for the moment
@@ -113,7 +113,6 @@ var TemplateDataGenerator = (function( ) {
 				}
 
 				// Override with the edited values:
-				console.log( $( '#tdg_pType_' + trID ).val() );
 				jsonOut.params[ paramName ].label = $( '#tdg_pLabel_' + trID ).val();
 				jsonOut.params[ paramName ]['type'] = $( '#tdg_pType_' + trID ).val();
 				jsonOut.params[ paramName ].description = $( '#tdg_pDesc_' + trID ).val();
@@ -184,9 +183,9 @@ var TemplateDataGenerator = (function( ) {
 				$addButton, $delButton;
 			
 			wikicontent = $( '#wpTextbox1' ).val();
+
 			// Get data from textbox
 			jsonTmplData = parseTemplateData( wikicontent );
-			
 			if (!error) {
 				// Template Description:
 				$descText = $( '<textarea>' )
@@ -245,16 +244,15 @@ var TemplateDataGenerator = (function( ) {
 							false;
 						
 						$delButton = $( '<button>' )
-							.attr( {
-								'id': 'tdg_pButton_' + paramCounter,
-								'data-paramnum': paramCounter
-							} )
+							.attr('id', 'tdg_pButton_' + paramCounter)
+							.data( 'paramnum', paramCounter )
 							.addClass( 'tdg-param-button-delete' )
-							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
-							.click( function () {
-								$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
-							} );
+							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) );
 						
+						$delButton.click( function () {
+								$( '.tdg-paramcount-' + $( this ).data( 'paramnum' ) ).remove();
+							} );
+
 						// Add Row:
 						$tbl.append( 
 							createTableRow( [
@@ -264,10 +262,11 @@ var TemplateDataGenerator = (function( ) {
 								$( '<textarea>' ).attr( 'id', 'tdg_pDesc_' + paramCounter ).val( pDesc ),
 								$tSelect,
 								$( '<input>' ).attr( 'id', 'tdg_pDefault_' + paramCounter ).val( pDefault ),
-								$( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + paramCounter ).prop( 'checked', pRequired )
+								$( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + paramCounter ).prop( 'checked', pRequired ),
+								$delButton
 							] )
-								.addClass( 'tdg-tr-param tdg-paramcount-' + paramCounter )
-								.attr( 'data-paramnum', paramCounter  )
+							.addClass( 'tdg-tr-param tdg-paramcount-' + paramCounter )
+							.data( 'data-paramnum', paramCounter  )
 						);
 						paramCounter++;
 					}
@@ -279,18 +278,17 @@ var TemplateDataGenerator = (function( ) {
 					.addClass( 'tdg-button-add-param' )
 					.text( mw.msg( 'templatedatagenerator-modal-button-addparam' ) )
 					.click( function () {
-						var $tSelect, $delButton;
+						var $tSelect, $dButton;
 
 						// add an empty row:
-						$delButton = $( '<button>' )
-							.attr( {
-								'id': 'tdg_pButton_' + paramCounter,
-								'data-paramnum': paramCounter
-							} )
+						$dButton = $( '<button>' )
+							.attr( 'id', 'tdg_pButton_' + paramCounter )
+							.data( 'paramnum', paramCounter )
 							.addClass( 'tdg-param-button-delete' )
-							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
-							.click( function () {
-								$( '.tdg-paramcount-' + $( this ).attr( 'data-paramnum' ) ).remove();
+							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) );
+						
+						$dButton.click( function () {
+								$( '.tdg-paramcount-' + $( this ).data( 'paramnum' ) ).remove();
 							} );
 
 						$tSelect = $originalTypeSelect.clone().attr('id', 'tdg_pType_' + paramCounter );
@@ -302,10 +300,11 @@ var TemplateDataGenerator = (function( ) {
 								$( '<textarea>' ).attr( 'id', 'tdg_pDesc_' + paramCounter ),
 								$tSelect,
 								$( '<input>' ).attr( 'id', 'tdg_pDefault_' + paramCounter ),
-								$( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + paramCounter )
+								$( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + paramCounter ),
+								$dButton
 							] )
 								.addClass( 'tdg-tr-param tdg-paramcount-' + paramCounter )
-								.attr( 'data-paramnum', paramCounter  )
+								.data( 'data-paramnum', paramCounter  )
 						);
 						paramCounter++;
 					} );
