@@ -1,16 +1,24 @@
 ( function ( $, mw ) {
 	'use strict';
 
-	// Check if there's an editor textarea:
-	if ( $( '#wpTextbox1' ).length > 0 ) {
-		var mTemplateData = TemplateDataGenerator;
-		mTemplateData.init();
-	}
+	
+	$( document ).ready(function () { 
 
-	$( '.tdg-editscreen-main-button' ).click( function () {
-		var $modalBox = TemplateDataGenerator.createModal();
-		$modalBox.dialog( 'open' );
-	});
-	
-	
+		// Check if there's an editor textarea (and that we're in Template namespace):
+		if ( $( '#wpTextbox1' ).length > 0 && mw.config.get('wgCanonicalNamespace') === 'Template' ) {
+			var $modalBox,
+				$textbox = $( '#wpTextbox1' );
+
+			TemplateDataGenerator.init();
+
+			$( '.tdg-editscreen-main-button' ).click( function () {
+				// TODO: Pass $textbox
+				$modalBox = TemplateDataGenerator.createModal( $textbox );
+				
+				$modalBox.dialog( 'open' );
+			});
+		}
+
+	} );
+
 }( jQuery, mediaWiki ) );

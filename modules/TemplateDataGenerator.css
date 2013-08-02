@@ -13,6 +13,10 @@
 	width: 100%;
 }
 
+.tdg-editTable .tdgerror .tdg-param-attr-name {
+	border: 2px solid red;
+}
+
 .tdg-editTable .tdg-tr-head {
 	font-size: 150%;
 }

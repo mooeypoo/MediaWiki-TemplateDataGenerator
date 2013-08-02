@@ -1,339 +1,514 @@
+/**
+ * TemplateDataGenerator generates the json string for templatedata
+ * or reads existing templatedata string and allows for it to be edited
+ * with a visual modal GUI.
+ * @author Moriel Schottlender (Mooeypoo)
+ */
+var TemplateDataGenerator = ( function() {
 
-var TemplateDataGenerator = (function( ) {
-	var i18nModal, jsonTmplData, wikicontent, error, param,
-	newTemplateData, textboxParts = [],
-
-	// Create the necessary DOM elements:
-	$editButton = $( '<button>' )
-		.addClass( 'tdg-editscreen-main-button' )
-		.text( mw.msg( 'templatedatagenerator-editbutton' ) ),
-	$errorBox = $( '<div>' )
-		.addClass( 'tdg-editscreen-error-msg' ),
-	$modalBox = $( '<div>' )
-		.addClass( 'tdg-editscreen-modal-form' )
-		.attr( 'id', 'modal-box' )
-		.attr( 'title', mw.msg( 'templatedatagenerator-modal-title' ) )
-		.hide(),
-
-	// Holds existing JSON information from the edit box
-	jsonInputData = '';
-
-	// Keep track of parameter count:
-	paramCounter = 0,
-
-	paramTypes = {
-		'undefined': mw.msg( 'templatedatagenerator-modal-table-param-type-undefined' ),
-		'number': mw.msg( 'templatedatagenerator-modal-table-param-type-number' ),
-		'string': mw.msg( 'templatedatagenerator-modal-table-param-type-string' ),
-		'string/wiki-user-name': mw.msg( 'templatedatagenerator-modal-table-param-type-user' ),
-		'string/wiki-page-name': mw.msg( 'templatedatagenerator-modal-table-param-type-page' )
-	},
-
-	createTypeSelectBox = function() {
-		var sel, $tSel = $( '<select>' )
-			.append( $( '<option>' ) );
-
-		for ( sel in paramTypes ) {
-			$tSel.append(
-				$( '<option>' ).prop( 'value', sel ).text( paramTypes[ sel ] )
-			);
-		}
-		
-		return $tSel;
-			
-	},
-	
-	createTableRow = function( tdContent ) {
-		var $row = $( '<tr>' ), $td = $( '<td>' ), $ptd;
-
-		tdContent.forEach( function ( td ) {
-			$ptd = $td.clone();
-			$row.append( $ptd.html( td ) );
-		} );
-
-		return $row;
-	},
-	
-	showErrorMsg = function ( msg ) {
-		$errorBox.text( mw.msg( msg ) );
-	},
-
-	parseTemplateData = function( content ) {
-		var error, json;
-		// Use regexp to get <templatedata> content
-		textboxParts = content.match(
-			/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i
-		);
-
-		// See if there was something between the tags:
-		if ( textboxParts &&
-			textboxParts[2] &&
-			$.trim( textboxParts[2] ).length > 0
-		) {
-			textboxParts[2] = $.trim( textboxParts[2] );
-			// Parse the json:
-			try {
-				json = $.parseJSON( textboxParts[2] );
-			} catch ( err ) {
-				// oops, JSON isn't proper.
-				showErrorMsg( 'templatedatagenerator-errormsg-jsonbadformat' );
-				error = true;
+	var glob = {
+		paramBase: {
+			name: {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-name' ),
+				dom: $( '<input>' ),
+				readMethod: 'val'
+			},
+			aliases: {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-aliases' ),
+				dom: $( '<input>' ),
+				readMethod: 'val'
+			},
+			label: {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-label' ),
+				dom: $( '<input>' ),
+				readMethod: 'val'
+			},
+			description: {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-desc' ),
+				dom: $( '<textarea>' ),
+				readMethod: 'val'
+			},
+			type: {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-type' ),
+				dom: $( '<select>' ),
+				readMethod: 'val'
+			},
+			'default': {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-default' ),
+				dom: $( '<input>' ),
+				readMethod: 'val'
+			},
+			'required': {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-required' ),
+				dom: $( '<input type="checkbox" />' ),
+				readMethod: 'chk'
+			},
+			delbutton: {
+				label: mw.msg( 'templatedatagenerator-modal-table-param-actions' ),
+				dom: $( '<button>' ).addClass( 'tdg-param-button-del' ),
+				readMethod: 'none'
 			}
-		} else {
-			// No <templatedata> tags. Mark as new:
-			newTemplateData = true;
+		},
+		paramTypes: {
+			'undefined': mw.msg( 'templatedatagenerator-modal-table-param-type-undefined' ),
+			'number': mw.msg( 'templatedatagenerator-modal-table-param-type-number' ),
+			'string': mw.msg( 'templatedatagenerator-modal-table-param-type-string' ),
+			'string/wiki-user-name': mw.msg( 'templatedatagenerator-modal-table-param-type-user' ),
+			'string/wiki-page-name': mw.msg( 'templatedatagenerator-modal-table-param-type-page' )
+		},
+		domObjects: {
+			$editButton: $( '<button>' )
+				.addClass( 'tdg-editscreen-main-button' )
+				.text( mw.msg( 'templatedatagenerator-editbutton' ) ),
+			$errorBox: $( '<div>' )
+				.addClass( 'tdg-editscreen-error-msg' )
+				.hide(),
+			$errorModalBox: $( '<div>' )
+				.addClass( 'tdg-errorbox' )
+				.hide(),
+			$modalBox: $( '<div>' )
+				.addClass( 'tdg-editscreen-modal-form' )
+				.attr( 'id', 'modal-box' )
+				.attr( 'title', mw.msg( 'templatedatagenerator-modal-title' ) )
+				.hide(),
+			$modalTable: {},
+			$wikitextEditorBox: {}
+		},
+		curr: {
+			newTemplate: false,
+			paramDomElements: {},
+			paramsJson: {}
 		}
-		
-		return json;
 	},
 
-	i18nModal = function( btnApply, btnCancel ) {
+	/* Helper Private Methods */
+
+	/**
+	 * Show an error message in the main Edit screen
+	 *
+	 * @param {string} msg
+	 */
+	showErrorEditPage = function( msg ) {
+		glob.domObjects.$errorBox.text( msg ).show();
+	},
+
+	
+	/**
+	 * Show an error message in the GUI
+	 *
+	 * @param {string} msg
+	 */
+	showErrorModal = function( msg ) {
+		glob.domObjects.$errorModalBox.text( msg ).show();
+	},
+
+	/**
+	 * Create <select> for parameter type based on the
+	 * options given by { key:value }
+	 *
+	 * @param {obj} options
+	 * @returns {DOM} <select> object
+	 */
+	createTypeSelect = function( opts ) {
+		var $sel, op;
+		$sel = $( '<select>' );
+		for ( op in opts ) {
+			$sel.append( $( '<option>' ).val( op ).text( opts[ op ] ) );
+		}
+		return $sel;
+	},
+
+	/**
+	 * Parse the json information from the wikitext
+	 * if it exists, and prepare DOM elements from
+	 * the parameters into the global param dom json
+	 *
+	 * @param {string} wikitext
+	 * @returns {obj} parameters json
+	 */
+	parseTemplateData = function( wikitext ) {
+		var p, attrb,
+			$tmpDom,
+			param = 0,
+			jsonParams = {},
+			error = false,
+			parts = wikitext.match(
+				/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i
+			);
+
+		// Check if <templatedata> exists
+		if ( parts && parts[2] ) {
+			// Make sure it's not empty:
+			if ( $.trim( parts[2] ).length > 0 ) {
+				try {
+					jsonParams = $.parseJSON( $.trim( parts[2] ) );
+				} catch ( err ) {
+					//oops, JSON isn't proper:
+					showErrorEditPage( mw.msg( 'templatedatagenerator-errormsg-jsonbadformat' ) );
+					return {};
+				}
+			} else {
+				glob.curr.newTemplate = true;
+			}
+
+			// See if jsonParams has 'params'
+			if ( jsonParams && jsonParams.params ) {
+
+				// add dom elements to the json data params:
+				for ( param in jsonParams.params ) {
+					glob.curr.paramDomElements[param] = {};
+					// Create dom elements per parameter
+					for ( attrb in glob.paramBase ) {
+						// Set up the dom element:
+						if ( attrb === 'type' ) {
+							$tmpDom = createTypeSelect( glob.paramTypes );
+						} else {
+							$tmpDom = glob.paramBase[attrb].dom;
+						}
+						glob.curr.paramDomElements[param][attrb] = $tmpDom.clone( true );
+						glob.curr.paramDomElements[param][attrb].data( 'paramid', param );
+						glob.curr.paramDomElements[param][attrb].addClass( 'tdg-param-attr-' + attrb );
+
+					}
+					// Set up the 'delete' button:
+					glob.curr.paramDomElements[param].delbutton
+						.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
+						.addClass( 'tdg-param-del' )
+						.data( 'paramid', param );
+
+					// Set up the delete action:
+					glob.curr.paramDomElements[param].delbutton.click( function() {
+						var paramid = $( this ).data( 'paramid' );
+						// delete the dom record:
+						delete glob.curr.paramDomElements[paramid];
+						// delete the actual row:
+						$( '#param-' + paramid ).remove();
+					} );
+				}
+			}
+		}
+
+		return jsonParams;
+
+	},
+
+	/**
+	 * Create a <table> DOM with initial headings for the parameters
+	 * The table headings will go by the glob.paramBase
+	 *
+	 * @returns {DOM} Table
+	 */
+	createParamTableDOM = function() {
+		var $tbl, $tr, param;
+
+		$tr = $( '<tr>' );
+		for ( param in glob.paramBase ) {
+			$tr.append( $( '<th>' ).text( glob.paramBase[param].label ) );
+		}
+
+		$tbl = $( '<table>' )
+			.addClass( 'tdg-editTable' )
+			.append( $tr );
+
+		return $tbl;
+	},
+
+	/**
+	 * Create a <table> DOM with initial headings for the parameters
+	 * The table headings will go by the glob.paramBase
+	 *
+	 * @returns {DOM} Table
+	 */
+	translateParamToRowDom = function( paramAttrObj ) {
+		var $trDom,
+			paramAttr,
+			paramid = paramAttrObj.delbutton.data( 'paramid' );
+
+		$trDom = $( '<tr>' )
+			.attr( 'id', 'param-' + paramid )
+			.data( 'paramid', paramid );
+
+		// Go over the attributes for <td>s:
+		for ( paramAttr in paramAttrObj ) {
+			// Check if value already exists for this in the original json:
+			if ( glob.curr.paramsJson.params[paramid] && glob.curr.paramsJson.params[paramid][paramAttr] ) {
+				// make sure we set the value correctly based on the DOM element:
+				if ( paramAttrObj[paramAttr].is( ':checkbox' ) ) {
+					paramAttrObj[paramAttr].prop( 'checked', glob.curr.paramsJson.params[paramid][paramAttr] );
+				} else {
+					paramAttrObj[paramAttr].val( glob.curr.paramsJson.params[paramid][paramAttr] );
+				}
+			}
+			$trDom.append( $( '<td>' ).html( paramAttrObj[paramAttr] ) );
+		}
+
+		// Set up the name:
+		if ( glob.curr.paramsJson.params[paramid] ) {
+			$trDom.find( '.tdg-param-attr-name' ).val( paramid );
+		}
+		return $trDom;
+	},
+
+	/**
+	 * Add an empty parameter to the paramDomElements list
+	 *
+	 * @returns {dom} <tr> row of the param
+	 */
+	addParam = function() {
+		var attrb,
+			// Create a unique identifier for paramid:
+			paramid = 'new_' + $.now();
+
+		// Add to the DOM object:
+		glob.curr.paramDomElements[paramid] = {};
+
+		for ( attrb in glob.paramBase ) {
+			// Set up the dom element:
+			if ( attrb === 'type' ) {
+				$tmpDom = createTypeSelect( glob.paramTypes );
+			} else {
+				$tmpDom = glob.paramBase[attrb].dom;
+			}
+			glob.curr.paramDomElements[paramid][attrb] = $tmpDom.clone( true );
+			glob.curr.paramDomElements[paramid][attrb].data( 'paramid', paramid );
+			glob.curr.paramDomElements[paramid][attrb].addClass( 'tdg-param-attr-' + attrb );
+
+		}
+		// Set up the 'delete' button:
+		glob.curr.paramDomElements[paramid].delbutton
+			.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
+			.addClass( 'tdg-param-del' )
+			.data( 'paramid', paramid );
+
+		// Set up the delete action:
+		glob.curr.paramDomElements[paramid].delbutton.click( function() {
+			var paramid = $( this ).data( 'paramid' );
+			// delete the dom record:
+			delete glob.curr.paramDomElements[paramid];
+			// delete the actual row:
+			$( '#param-' + paramid ).remove();
+		} );
+		return glob.curr.paramDomElements[paramid];
+	},
+
+	/**
+	 * Validate the Modal inputs before continuing to the actual 'apply'
+	 *
+	 * @returns {boolean} Passed validation or not.
+	 */
+	validateForm = function() {
+		var paramID,
+			paramNameArray,
+			passed = true;
+		// Reset:
+		$( '.tdgerror' ).removeClass( 'tdgerror' );
+		$errorModalBox.empty().hide();
+		// Go over the paramDomElements object, look for:
+		// * empty name fields
+		// * duplicate *name* values:
+		for ( paramID in glob.curr.paramDomElements ) {
+			// Name field is empty:
+			if ( glob.curr.paramDomElements[paramID].name.val().length === 0 ) {
+				passed = false;
+				glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
+			}
+			if ( jQuery.inArray( glob.curr.paramDomElements[paramID].name, paramNameArray ) ) {
+				// This is dupe!
+				passed = false;
+				glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
+			}
+		}
+		return passed;
+	},
+
+	/**
+	 * Reset the GUI completely, including the domElements and the json
+	 */
+	globalReset = function() {
+		// Reset Modal GUI:
+		glob.domObjects.$modalBox.empty();
+		glob.domObjects.$errorModalBox.empty().hide();
+		// Reset vars:
+		glob.curr = {
+			newTemplate: false,
+			paramDomElements: {},
+			paramsJson: {}
+		};
+
+	},
+	/**
+	 * Create i18n-compatible Modal Buttons
+	 * also contains the 'apply' functionality
+	 *
+	 * @param {string} btnApply the text for the 'apply' button
+	 * @param {string} btnCancel the text for the 'cancel' button
+	 * @returns {Array} Button objects with their functionality, for the modal
+	 */
+	i18nModalButtons = function( btnApply, btnCancel ) {
 		var modalButtons = {};
 
-		modalButtons[btnApply] = function () {
-			var jsonOut = {},
+		modalButtons[btnApply] = function() {
+			var paramid,
+				paramName,
+				attrb,
+				wikitext = glob.domObjects.$wikitextEditorBox.val(),
+				outputJson = {},
 				finalOutput = '';
 
-			// Description:
-			jsonOut.description = $( '.tdg-template-desc' ).val();
-			jsonOut.params = {};
-
-			// Go over the table:
-			$( '.tdg-editTable tr:gt(0)' ).each( function () {
-				var trID = $( this ).data( 'data-paramnum' ),
-					paramName = $( '#tdg_pName_' + trID ).val();
-
-				jsonOut.params[ paramName ] = {};
-
-				if ( !newTemplateData && jsonTmplData && jsonTmplData.params && jsonTmplData.params[ paramName ] ) { 
-					// Try to preserve the structure of the original JSON
-					// Merge the properties of the json parameter even if they're not
-					// supported in the GUI for the moment
-					$.extend( jsonOut.params[ paramName ], jsonTmplData.params[ paramName ] );
-				}
-
-				// Override with the edited values:
-				jsonOut.params[ paramName ].label = $( '#tdg_pLabel_' + trID ).val();
-				jsonOut.params[ paramName ]['type'] = $( '#tdg_pType_' + trID ).val();
-				jsonOut.params[ paramName ].description = $( '#tdg_pDesc_' + trID ).val();
-				jsonOut.params[ paramName ].required = $( '#tdg_pRequired_' + trID ).val();
-				jsonOut.params[ paramName ]['default'] = $( '#tdg_pDefault_' + trID ).val();
-
-				if ( $( '#tdg_pAliases_' + trID ).val() ) {
-					jsonOut.params[ paramName ].aliases =
-						$( '#tdg_pAliases_' + trID ).val().split( ',' );
-				}
-			} );
-
-			// Now return jsonOut to the textbox:
-			if ( textboxParts && textboxParts[2] ) {
-				// put the json back where the tags were:
-				finalOutput = wikicontent.replace(
-					/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i,
-					'<templatedata>\n' + JSON.stringify( jsonOut, null, '	' ) + '\n</templatedata>'
-				);
+			//validate:
+			if ( !validateForm() ) {
+				showErrorModal( mw.msg( 'templatedatagenerator-modal-errormsg' ) );
 			} else {
-				// otherwise, put this at the end of the text:
-				finalOutput = wikicontent +
-					'\n<templatedata>\n' +
-					JSON.stringify( jsonOut, null, '\t' ) +
-					'\n</templatedata>';
-			}
 
-			$( '#wpTextbox1' ).val( finalOutput );
-			$modalBox.dialog( 'close' );
+				// create a new json element by going over paramDomElements
+				// but also verify that within each param in paramDomElements
+				// all *attributes* that are not represented in the GUI
+				// are preserved.
+
+				outputJson.description = $( '.tdg-template-description' ).val();
+				// Add parameters:
+				outputJson.params = {};
+				for ( paramid in glob.curr.paramDomElements ) {
+					// Transform paramid into param name, and ignore param with empty name:
+					if ( glob.curr.paramDomElements[paramid].name.val() ) {
+						paramName = glob.curr.paramDomElements[paramid].name.val();
+						outputJson.params[paramName] = {};
+						// Add the attributes that exist in the gui first:
+						for ( attrb in glob.curr.paramDomElements[paramid] ) {
+							if ( attrb !== 'delbutton' ) { //ignore the delbutton
+								if ( glob.curr.paramDomElements[paramid][attrb].is( ':checkbox' ) ) {
+									outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].prop( 'checked' );
+								} else {
+									if ( attrb === 'aliases' ) {
+										outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].val().split(',');
+									}
+										outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].val();
+								}
+							}
+						}
+
+						// Add attributes that are in the original json but not in GUI:
+						if ( glob.curr.paramsJson.params[paramid] ) {
+							for ( attrb in glob.curr.paramsJson.params[paramid] ) {
+								// Only add this attribute if it appears in the original json, but not in the new json:
+								if ( glob.curr.paramsJson.params[paramid][attrb] && !outputJson.params[paramName][attrb] && attrb !== 'delbutton' ) {
+									outputJson.params[paramName][attrb] = glob.curr.paramsJson.params[paramid][attrb];
+								}
+							}
+						}
+					}
+				}
+
+				if ( glob.curr.paramsJson ) {
+					// Return the json to the textbox:
+					finalOutput = wikitext.replace(
+						/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i,
+						'<templatedata>\n' + JSON.stringify( outputJson, null, '	' ) + '\n</templatedata>'
+					);
+
+				} else {
+					// Append the json to the end of the textbox:
+					finalOutput = wikitext + '\n<templatedata>\n';
+					finalOutput += JSON.stringify( outputJson, null, '	' );
+					finalOutput += '\n</templatedata>';
+				}
+
+				glob.domObjects.$wikitextEditorBox.val( finalOutput );
+				glob.domObjects.$modalBox.dialog( 'close' );
+			}
 		};
 
-		modalButtons[btnCancel] = function () {
-			$modalBox.dialog( 'close' );
+		modalButtons[btnCancel] = function() {
+			glob.domObjects.$modalBox.dialog( 'close' );
 		};
 
-		$modalBox.dialog( {
-			autoOpen: false,
-			height: window.innerHeight * 0.8,
-			width: window.innerWidth * 0.8,
-			modal: true,
-			buttons: modalButtons,
-			close: function () {
-				// Reset:
-				$modalBox.empty();
-				rowCounter = 0;
-			}
-		} );
+		return modalButtons;
 	};
-	
+
 	/** Public Methods **/
 	return {
-		/** 
-		 * Initialize the page by adding the DOM elements
+		/**
+		 * Injects required DOM elements to the edit screen
 		 */
 		init: function() {
 			// Prepend to document:
 			$( '#mw-content-text' )
-				.prepend( $editButton )
-				.prepend( $modalBox );
+				.prepend( glob.domObjects.$modalBox )
+				.prepend( glob.domObjects.$errorBox )
+				.prepend( glob.domObjects.$editButton );
 		},
 
 		/**
-		 * Create the Modal GUI
+		 * Create the modal screen and populate it with existing
+		 * data, if available
+		 *
+		 * @param {string} existing article wikitext
+		 * @returns {DOM} modal div
 		 */
-		createModal: function() {
-			var $descText, $originalTypeSelect, $tSelect, $tbl,
-				pAliases, pDesc, pDefault, pRequired, 
-				$addButton, $delButton;
-			
-			wikicontent = $( '#wpTextbox1' ).val();
+		createModal: function( wikitextBox ) {
+			var $row,
+				paramObj,
+				$descBox;
 
-			// Get data from textbox
-			jsonTmplData = parseTemplateData( wikicontent );
-			if (!error) {
-				// Template Description:
-				$descText = $( '<textarea>' )
-					.addClass( 'tdg-template-desc' );
-				if ( !newTemplateData && jsonTmplData && jsonTmplData.description ) {
-					$descText.html( jsonTmplData.description );
+			// Reset:
+			globalReset();
+
+			glob.domObjects.$wikitextEditorBox = wikitextBox;
+			$descBox = $( '<textarea>' ).addClass( 'tdg-template-description' );
+			glob.domObjects.$modalTable = createParamTableDOM();
+
+			// Parse JSON:
+			glob.curr.paramsJson = parseTemplateData( glob.domObjects.$wikitextEditorBox.val() );
+			if ( !jQuery.isEmptyObject( glob.curr.paramsJson ) ) {
+				if ( glob.curr.paramsJson.description ) {
+					$descBox.val( glob.curr.paramsJson.description );
 				}
-				
-				// Type Selection:
-				$originalTypeSelect = createTypeSelectBox();
-				
-				// Table:
-				$tbl = $( '<table>' )
-					.addClass( 'tdg-editTable' )
-					// Header:
-					.append( createTableRow( [ 
-						mw.msg( 'templatedatagenerator-modal-table-param-name' ),
-						mw.msg( 'templatedatagenerator-modal-table-param-aliases' ),
-						mw.msg( 'templatedatagenerator-modal-table-param-label' ),
-						mw.msg( 'templatedatagenerator-modal-table-param-desc' ),
-						mw.msg( 'templatedatagenerator-modal-table-param-type' ),
-						mw.msg( 'templatedatagenerator-modal-table-param-default' ),
-						mw.msg( 'templatedatagenerator-modal-table-param-required' ),
-						mw.msg( 'templatedatagenerator-modal-table-param-actions' )
-					] ) );
-				
-				// Add Existing Parameters:
-				if ( !newTemplateData && jsonTmplData && jsonTmplData.params ) {
-					for ( param in jsonTmplData.params ) {
-						// Set up the details:
-						pAliases = '';
-						if ( jsonTmplData.params[param].aliases ) {
-							pAliases = jsonTmplData.params[param].aliases.join( ',' );
-						}
-
-						pDesc = '';
-						if ( typeof jsonTmplData.params[param].description === 'string' ) {
-							pDesc = jsonTmplData.params[param].description;
-						}
-
-						// Type:
-						$tSelect = $originalTypeSelect.clone().attr( 'id', 'tdg_pType_' + paramCounter );
-						if ( jsonTmplData.params[param].type ) {
-							$tSelect.val( jsonTmplData.params[param].type );
-						} else {
-							$tSelect.val( 0 );
-						}
-
-						pDefault = '';
-						if ( jsonTmplData.params[param]['default'] ) {
-							pDefault = jsonTmplData.params[param]['default'];
-						}
-
-						pRequired = ( jsonTmplData.params[param].required !== undefined ) ?
-							jsonTmplData.params[param].required :
-							false;
-						
-						$delButton = $( '<button>' )
-							.attr('id', 'tdg_pButton_' + paramCounter)
-							.data( 'paramnum', paramCounter )
-							.addClass( 'tdg-param-button-delete' )
-							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) );
-						
-						$delButton.click( function () {
-								$( '.tdg-paramcount-' + $( this ).data( 'paramnum' ) ).remove();
-							} );
-
-						// Add Row:
-						$tbl.append( 
-							createTableRow( [
-								$( '<input>' ).attr( 'id', 'tdg_pName_' + paramCounter ).val( param ),
-								$( '<input>' ).attr( 'id', 'tdg_pAliases_' + paramCounter ).val( pAliases ),
-								$( '<input>' ).attr( 'id', 'tdg_pLabel_' + paramCounter ).val( jsonTmplData.params[param].label ),
-								$( '<textarea>' ).attr( 'id', 'tdg_pDesc_' + paramCounter ).val( pDesc ),
-								$tSelect,
-								$( '<input>' ).attr( 'id', 'tdg_pDefault_' + paramCounter ).val( pDefault ),
-								$( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + paramCounter ).prop( 'checked', pRequired ),
-								$delButton
-							] )
-							.addClass( 'tdg-tr-param tdg-paramcount-' + paramCounter )
-							.data( 'data-paramnum', paramCounter  )
-						);
-						paramCounter++;
-					}
+				// Build the parameter row DOMs:
+				for ( paramObj in glob.curr.paramDomElements ) {
+					// make the row:
+					$row = translateParamToRowDom( glob.curr.paramDomElements[paramObj] );
+					glob.domObjects.$modalTable.append( $row );
 				}
-				
-				// Add the "ADD PARAM" button:
-				$addButton = $( '<button>' )
-					.attr( 'id', 'tdg_add_param')
-					.addClass( 'tdg-button-add-param' )
-					.text( mw.msg( 'templatedatagenerator-modal-button-addparam' ) )
-					.click( function () {
-						var $tSelect, $dButton;
+			}
 
-						// add an empty row:
-						$dButton = $( '<button>' )
-							.attr( 'id', 'tdg_pButton_' + paramCounter )
-							.data( 'paramnum', paramCounter )
-							.addClass( 'tdg-param-button-delete' )
-							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) );
-						
-						$dButton.click( function () {
-								$( '.tdg-paramcount-' + $( this ).data( 'paramnum' ) ).remove();
-							} );
 
-						$tSelect = $originalTypeSelect.clone().attr('id', 'tdg_pType_' + paramCounter );
-						$tbl.append( 
-							createTableRow( [
-								$( '<input>' ).attr( 'id', 'tdg_pName_' + paramCounter ),
-								$( '<input>' ).attr( 'id', 'tdg_pAliases_' + paramCounter ),
-								$( '<input>' ).attr( 'id', 'tdg_pLabel_' + paramCounter ),
-								$( '<textarea>' ).attr( 'id', 'tdg_pDesc_' + paramCounter ),
-								$tSelect,
-								$( '<input>' ).attr( 'id', 'tdg_pDefault_' + paramCounter ),
-								$( '<input type="checkbox"/>' ).attr( 'id', 'tdg_pRequired' + paramCounter ),
-								$dButton
-							] )
-								.addClass( 'tdg-tr-param tdg-paramcount-' + paramCounter )
-								.data( 'data-paramnum', paramCounter  )
-						);
-						paramCounter++;
-					} );
-				
-				// Build the GUI:
-				
-				$modalBox.append(
-					$( '<span>' )
-						.addClass( 'tdg-title' )
-						.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) ),
-					$descText,
-					$( '<span>' )
-						.addClass( 'tdg-title' )
-						.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) ),
-					$tbl,
-					$addButton
-				);
+			// Build the Modal window:
+			glob.domObjects.$modalBox
+				.append( $( '<span>' )
+							.addClass( 'tdg-title' )
+							.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) ) )
+				.append( $descBox )
+				.append( glob.domObjects.$errorModalBox )
+				.append( $( '<span>' )
+							.addClass( 'tdg-title' )
+							.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) ) )
+				.append( glob.domObjects.$modalTable )
+				.append(
+					$( '<button>' )
+						.text( mw.msg( 'templatedatagenerator-modal-button-addparam' ) )
+						.addClass( 'tdg-addparam' )
+						.click( function() {
+							var newParam = addParam(),
+								$row = translateParamToRowDom( newParam );
+								glob.domObjects.$modalTable.append( $row );
+					} ) );
 
-				// Set up the Modal:
-				i18nModal(
+			glob.domObjects.$modalBox.dialog( {
+				autoOpen: false,
+				height: window.innerHeight * 0.8,
+				width: window.innerWidth * 0.8,
+				modal: true,
+				buttons: i18nModalButtons(
 					mw.msg( 'templatedatagenerator-modal-buttons-apply' ),
 					mw.msg( 'templatedatagenerator-modal-buttons-cancel' )
-				);
+				),
+				close: function () {
+					glob.domObjects.$modalBox.empty();
+				}
+			} );
 
-				// return the $modalBox object so it can be called on button click:
-				return $modalBox;
-			}
+			// Return the modal object
+			return glob.domObjects.$modalBox;
 		}
 	};
-	
-})();
-
+} )();
