@@ -298,11 +298,11 @@ var TemplateDataGenerator = ( function() {
 	 */
 	validateForm = function() {
 		var paramID,
-			paramNameArray,
+			paramNameArray = [],
 			passed = true;
 		// Reset:
 		$( '.tdgerror' ).removeClass( 'tdgerror' );
-		$errorModalBox.empty().hide();
+		glob.domObjects.$errorModalBox.empty().hide();
 		// Go over the paramDomElements object, look for:
 		// * empty name fields
 		// * duplicate *name* values:
@@ -312,10 +312,13 @@ var TemplateDataGenerator = ( function() {
 				passed = false;
 				glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
 			}
-			if ( jQuery.inArray( glob.curr.paramDomElements[paramID].name, paramNameArray ) ) {
+
+			if ( jQuery.inArray( glob.curr.paramDomElements[paramID].name.val(), paramNameArray ) > -1 ) {
 				// This is dupe!
 				passed = false;
 				glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
+			} else {
+				paramNameArray.push( glob.curr.paramDomElements[paramID].name.val() );
 			}
 		}
 		return passed;
