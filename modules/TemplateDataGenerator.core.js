@@ -93,7 +93,7 @@
 			glob.domObjects.$errorBox.text( msg ).show();
 		},
 
-		
+
 		/**
 		 * Show an error message in the GUI
 		 *
@@ -128,11 +128,10 @@
 		 * @returns {obj} parameters json
 		 */
 		parseTemplateData = function( wikitext ) {
-			var p, attrb,
+			var attrb,
 				$tmpDom,
-				param = 0,
+				param,
 				jsonParams = {},
-				error = false,
 				parts = wikitext.match(
 					/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i
 				);
@@ -257,6 +256,7 @@
 		 */
 		addParam = function() {
 			var attrb,
+				$tmpDom,
 				// Create a unique identifier for paramid:
 				paramid = 'new_' + $.now();
 
