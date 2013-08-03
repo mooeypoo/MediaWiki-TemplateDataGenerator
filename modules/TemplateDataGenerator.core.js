@@ -18,7 +18,7 @@
 		 */
 		function showErrorEditPage ( msg ) {
 			glob.domObjects.$errorBox.text( msg ).show();
-		};
+		}
 
 
 		/**
@@ -28,7 +28,7 @@
 		 */
 		function showErrorModal ( msg ) {
 			glob.domObjects.$errorModalBox.text( msg ).show();
-		};
+		}
 
 		/**
 		 * Create <select> for parameter type based on the
@@ -44,7 +44,7 @@
 				$sel.append( $( '<option>' ).val( op ).text( opts[ op ] ) );
 			}
 			return $sel;
-		};
+		}
 
 		/**
 		 * Parse the json information from the wikitext
@@ -107,10 +107,8 @@
 					}
 				}
 			}
-
 			return jsonParams;
-
-		};
+		}
 
 		/**
 		 * Create a <table> DOM with initial headings for the parameters
@@ -131,7 +129,7 @@
 				.append( $tr );
 
 			return $tbl;
-		};
+		}
 
 		/**
 		 * Create a <table> DOM with initial headings for the parameters
@@ -168,7 +166,7 @@
 			}
 
 			return $trDom;
-		};
+		}
 
 		/**
 		 * Add an empty parameter to the paramDomElements list
@@ -204,7 +202,7 @@
 				.data( 'paramid', paramid );
 
 			return glob.curr.paramDomElements[paramid];
-		};
+		}
 
 		/**
 		 * Validate the Modal inputs before continuing to the actual 'apply'
@@ -237,7 +235,7 @@
 				}
 			}
 			return passed;
-		};
+		}
 
 		/**
 		 * Reset the GUI completely, including the domElements and the json
@@ -252,8 +250,7 @@
 				paramDomElements: {},
 				paramsJson: {}
 			};
-
-		};
+		}
 		/**
 		 * Create i18n-compatible Modal Buttons
 		 * also contains the 'apply' functionality
@@ -341,7 +338,7 @@
 			};
 
 			return modalButtons;
-		};
+		}
 
 		/** Public Methods **/
 		return {
@@ -469,13 +466,13 @@
 				glob.domObjects.$modalBox
 					.append( $( '<span>' )
 						.addClass( 'tdg-title' )
-						.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) ) 
+						.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) )
 					)
 					.append( $descBox )
 					.append( glob.domObjects.$errorModalBox )
 					.append( $( '<span>' )
 						.addClass( 'tdg-title' )
-						.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) ) 
+						.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) )
 					)
 					.append( glob.domObjects.$modalTable )
 					.append(
