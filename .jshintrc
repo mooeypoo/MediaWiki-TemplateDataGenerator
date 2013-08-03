@@ -17,4 +17,16 @@
         "unused": true,
         // Legacy
         "onevar": true
+
+        /* Local */
+
+        // Enforcing
+	"regexp": true,
+	"strict": true,
+	// Environment
+	"browser": true,
+	"jquery": true,
+
+	"predef": [
+	]
 }
