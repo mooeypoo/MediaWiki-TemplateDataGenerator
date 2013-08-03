@@ -20,13 +20,10 @@
 
         /* Local */
 
-        // Enforcing
-	"regexp": true,
-	"strict": true,
-	// Environment
 	"browser": true,
-	"jquery": true,
 
 	"predef": [
+		'mediaWiki',
+		'jQuery'
 	]
 }
