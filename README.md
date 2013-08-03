@@ -1,4 +1,4 @@
-TemplateData Generator
+TemplateData Generator [![Build Status](https://travis-ci.org/mooeypoo/MediaWiki-TemplateDataGenerator.png?branch=master)](https://travis-ci.org/mooeypoo/MediaWiki-TemplateDataGenerator)
 ======================
 
 This is a prototype extension for editing TemplateData json in MediaWiki sites.
