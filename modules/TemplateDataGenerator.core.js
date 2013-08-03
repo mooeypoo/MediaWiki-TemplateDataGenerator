@@ -46,7 +46,15 @@
 				},
 				delbutton: {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-actions' ),
-					dom: $( '<button>' ).addClass( 'tdg-param-button-del' ),
+					dom: $( '<button>' )
+						.addClass( 'tdg-param-button-del' )
+						.click( function() {
+							var paramid = $( this ).data( 'paramid' );
+							// delete the dom record:
+							delete glob.curr.paramDomElements[paramid];
+							// delete the actual row:
+							$( '#param-' + paramid ).remove();
+						} ),
 					readMethod: 'none'
 				}
 			},
@@ -174,16 +182,9 @@
 						glob.curr.paramDomElements[param].delbutton
 							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
 							.addClass( 'tdg-param-del' )
+							.attr( 'id', 'tdg-param-del' )
 							.data( 'paramid', param );
 
-						// Set up the delete action:
-						glob.curr.paramDomElements[param].delbutton.click( function() {
-							var paramid = $( this ).data( 'paramid' );
-							// delete the dom record:
-							delete glob.curr.paramDomElements[paramid];
-							// delete the actual row:
-							$( '#param-' + paramid ).remove();
-						} );
 					}
 				}
 			}
@@ -246,6 +247,7 @@
 			if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] ) {
 				$trDom.find( '.tdg-param-attr-name' ).val( paramid );
 			}
+			
 			return $trDom;
 		},
 
@@ -279,16 +281,9 @@
 			glob.curr.paramDomElements[paramid].delbutton
 				.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
 				.addClass( 'tdg-param-del' )
+				.attr( 'id', 'tdg-param-del' )
 				.data( 'paramid', paramid );
 
-			// Set up the delete action:
-			glob.curr.paramDomElements[paramid].delbutton.click( function() {
-				var paramid = $( this ).data( 'paramid' );
-				// delete the dom record:
-				delete glob.curr.paramDomElements[paramid];
-				// delete the actual row:
-				$( '#param-' + paramid ).remove();
-			} );
 			return glob.curr.paramDomElements[paramid];
 		},
 
@@ -474,7 +469,6 @@
 						glob.domObjects.$modalTable.append( $row );
 					}
 				}
-
 
 				// Build the Modal window:
 				glob.domObjects.$modalBox
