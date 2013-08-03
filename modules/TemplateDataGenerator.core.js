@@ -5,9 +5,9 @@
 	 * with a visual modal GUI.
 	 * @author Moriel Schottlender (Mooeypoo)
 	 */
-	mw.libs.TemplateDataGenerator = ( function() {
+	mw.libs.TemplateDataGenerator = ( function () {
 
-		var glob = {},
+		var glob = {};
 
 		/* Helper Private Methods */
 
@@ -16,9 +16,9 @@
 		 *
 		 * @param {string} msg
 		 */
-		showErrorEditPage = function( msg ) {
+		function showErrorEditPage ( msg ) {
 			glob.domObjects.$errorBox.text( msg ).show();
-		},
+		};
 
 
 		/**
@@ -26,9 +26,9 @@
 		 *
 		 * @param {string} msg
 		 */
-		showErrorModal = function( msg ) {
+		function showErrorModal ( msg ) {
 			glob.domObjects.$errorModalBox.text( msg ).show();
-		},
+		};
 
 		/**
 		 * Create <select> for parameter type based on the
@@ -37,14 +37,14 @@
 		 * @param {obj} options
 		 * @returns {DOM} <select> object
 		 */
-		createTypeSelect = function( opts ) {
+		function createTypeSelect ( opts ) {
 			var $sel, op;
 			$sel = $( '<select>' );
 			for ( op in opts ) {
 				$sel.append( $( '<option>' ).val( op ).text( opts[ op ] ) );
 			}
 			return $sel;
-		},
+		};
 
 		/**
 		 * Parse the json information from the wikitext
@@ -54,7 +54,7 @@
 		 * @param {string} wikitext
 		 * @returns {obj} parameters json
 		 */
-		parseTemplateData = function( wikitext ) {
+		function parseTemplateData ( wikitext ) {
 			var attrb,
 				$tmpDom,
 				param,
@@ -110,7 +110,7 @@
 
 			return jsonParams;
 
-		},
+		};
 
 		/**
 		 * Create a <table> DOM with initial headings for the parameters
@@ -118,7 +118,7 @@
 		 *
 		 * @returns {DOM} Table
 		 */
-		createParamTableDOM = function() {
+		function createParamTableDOM () {
 			var $tbl, $tr, param;
 
 			$tr = $( '<tr>' );
@@ -131,7 +131,7 @@
 				.append( $tr );
 
 			return $tbl;
-		},
+		};
 
 		/**
 		 * Create a <table> DOM with initial headings for the parameters
@@ -139,7 +139,7 @@
 		 *
 		 * @returns {DOM} Table
 		 */
-		translateParamToRowDom = function( paramAttrObj ) {
+		function translateParamToRowDom ( paramAttrObj ) {
 			var $trDom,
 				paramAttr,
 				paramid = paramAttrObj.delbutton.data( 'paramid' );
@@ -168,14 +168,14 @@
 			}
 
 			return $trDom;
-		},
+		};
 
 		/**
 		 * Add an empty parameter to the paramDomElements list
 		 *
 		 * @returns {dom} <tr> row of the param
 		 */
-		addParam = function() {
+		function addParam () {
 			var attrb,
 				$tmpDom,
 				// Create a unique identifier for paramid:
@@ -204,14 +204,14 @@
 				.data( 'paramid', paramid );
 
 			return glob.curr.paramDomElements[paramid];
-		},
+		};
 
 		/**
 		 * Validate the Modal inputs before continuing to the actual 'apply'
 		 *
 		 * @returns {boolean} Passed validation or not.
 		 */
-		validateForm = function() {
+		function validateForm () {
 			var paramID,
 				paramNameArray = [],
 				passed = true;
@@ -228,7 +228,7 @@
 					glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
 				}
 
-				if ( jQuery.inArray( glob.curr.paramDomElements[paramID].name.val(), paramNameArray ) > -1 ) {
+				if ( $.inArray( glob.curr.paramDomElements[paramID].name.val(), paramNameArray ) > -1 ) {
 					// This is dupe!
 					passed = false;
 					glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
@@ -237,12 +237,12 @@
 				}
 			}
 			return passed;
-		},
+		};
 
 		/**
 		 * Reset the GUI completely, including the domElements and the json
 		 */
-		globalReset = function() {
+		function globalReset () {
 			// Reset Modal GUI:
 			glob.domObjects.$modalBox.empty();
 			glob.domObjects.$errorModalBox.empty().hide();
@@ -253,7 +253,7 @@
 				paramsJson: {}
 			};
 
-		},
+		};
 		/**
 		 * Create i18n-compatible Modal Buttons
 		 * also contains the 'apply' functionality
@@ -262,10 +262,10 @@
 		 * @param {string} btnCancel the text for the 'cancel' button
 		 * @returns {Array} Button objects with their functionality, for the modal
 		 */
-		i18nModalButtons = function( btnApply, btnCancel ) {
+		function i18nModalButtons ( btnApply, btnCancel ) {
 			var modalButtons = {};
 
-			modalButtons[btnApply] = function() {
+			modalButtons[btnApply] = function () {
 				var paramid,
 					paramName,
 					attrb,
@@ -317,7 +317,7 @@
 						}
 					}
 
-					if ( !jQuery.isEmptyObject( glob.curr.paramsJson ) ) {
+					if ( !$.isEmptyObject( glob.curr.paramsJson ) ) {
 						// Return the json to the textbox:
 						finalOutput = wikitext.replace(
 							/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i,
@@ -336,7 +336,7 @@
 				}
 			};
 
-			modalButtons[btnCancel] = function() {
+			modalButtons[btnCancel] = function () {
 				glob.domObjects.$modalBox.dialog( 'close' );
 			};
 
@@ -348,7 +348,7 @@
 			/**
 			 * Injects required DOM elements to the edit screen
 			 */
-			init: function() {
+			init: function () {
 				// Prepare the globals:
 				glob = {
 					paramBase: {
@@ -384,7 +384,7 @@
 							label: mw.msg( 'templatedatagenerator-modal-table-param-actions' ),
 							dom: $( '<button>' )
 								.addClass( 'tdg-param-button-del' )
-								.click( function() {
+								.click( function () {
 									var paramid = $( this ).data( 'paramid' );
 									// delete the dom record:
 									delete glob.curr.paramDomElements[paramid];
@@ -439,7 +439,7 @@
 			 * @param {string} existing article wikitext
 			 * @returns {DOM} modal div
 			 */
-			createModal: function( wikitextBox ) {
+			createModal: function ( wikitextBox ) {
 				var $row,
 					paramObj,
 					$descBox;
@@ -453,7 +453,7 @@
 
 				// Parse JSON:
 				glob.curr.paramsJson = parseTemplateData( glob.domObjects.$wikitextEditorBox.val() );
-				if ( !jQuery.isEmptyObject( glob.curr.paramsJson ) ) {
+				if ( !$.isEmptyObject( glob.curr.paramsJson ) ) {
 					if ( glob.curr.paramsJson.description ) {
 						$descBox.val( glob.curr.paramsJson.description );
 					}
@@ -468,23 +468,26 @@
 				// Build the Modal window:
 				glob.domObjects.$modalBox
 					.append( $( '<span>' )
-								.addClass( 'tdg-title' )
-								.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) ) )
+						.addClass( 'tdg-title' )
+						.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) ) 
+					)
 					.append( $descBox )
 					.append( glob.domObjects.$errorModalBox )
 					.append( $( '<span>' )
-								.addClass( 'tdg-title' )
-								.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) ) )
+						.addClass( 'tdg-title' )
+						.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) ) 
+					)
 					.append( glob.domObjects.$modalTable )
 					.append(
 						$( '<button>' )
 							.text( mw.msg( 'templatedatagenerator-modal-button-addparam' ) )
 							.addClass( 'tdg-addparam' )
-							.click( function() {
+							.click( function () {
 								var newParam = addParam(),
 									$row = translateParamToRowDom( newParam );
 									glob.domObjects.$modalTable.append( $row );
-						} ) );
+						} )
+					);
 
 				glob.domObjects.$modalBox.dialog( {
 					autoOpen: false,
