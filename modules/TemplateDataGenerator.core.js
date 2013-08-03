@@ -7,80 +7,7 @@
 	 */
 	mw.libs.TemplateDataGenerator = ( function() {
 
-		var glob = {
-			paramBase: {
-				name: {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-name' ),
-					dom: $( '<input>' )
-				},
-				aliases: {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-aliases' ),
-					dom: $( '<input>' )
-				},
-				label: {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-label' ),
-					dom: $( '<input>' )
-				},
-				description: {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-desc' ),
-					dom: $( '<textarea>' )
-				},
-				type: {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-type' ),
-					dom: $( '<select>' )
-				},
-				'default': {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-default' ),
-					dom: $( '<input>' )
-				},
-				'required': {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-required' ),
-					dom: $( '<input type="checkbox" />' )
-				},
-				delbutton: {
-					label: mw.msg( 'templatedatagenerator-modal-table-param-actions' ),
-					dom: $( '<button>' )
-						.addClass( 'tdg-param-button-del' )
-						.click( function() {
-							var paramid = $( this ).data( 'paramid' );
-							// delete the dom record:
-							delete glob.curr.paramDomElements[paramid];
-							// delete the actual row:
-							$( '#param-' + paramid ).remove();
-						} )
-				}
-			},
-			paramTypes: {
-				'undefined': mw.msg( 'templatedatagenerator-modal-table-param-type-undefined' ),
-				'number': mw.msg( 'templatedatagenerator-modal-table-param-type-number' ),
-				'string': mw.msg( 'templatedatagenerator-modal-table-param-type-string' ),
-				'string/wiki-user-name': mw.msg( 'templatedatagenerator-modal-table-param-type-user' ),
-				'string/wiki-page-name': mw.msg( 'templatedatagenerator-modal-table-param-type-page' )
-			},
-			domObjects: {
-				$editButton: $( '<button>' )
-					.addClass( 'tdg-editscreen-main-button' )
-					.text( mw.msg( 'templatedatagenerator-editbutton' ) ),
-				$errorBox: $( '<div>' )
-					.addClass( 'tdg-editscreen-error-msg' )
-					.hide(),
-				$errorModalBox: $( '<div>' )
-					.addClass( 'tdg-errorbox' )
-					.hide(),
-				$modalBox: $( '<div>' )
-					.addClass( 'tdg-editscreen-modal-form' )
-					.attr( 'id', 'modal-box' )
-					.attr( 'title', mw.msg( 'templatedatagenerator-modal-title' ) )
-					.hide(),
-				$modalTable: {},
-				$wikitextEditorBox: {}
-			},
-			curr: {
-				newTemplate: false,
-				paramDomElements: {},
-				paramsJson: {}
-			}
-		},
+		var glob = {},
 
 		/* Helper Private Methods */
 
@@ -239,7 +166,7 @@
 			if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] ) {
 				$trDom.find( '.tdg-param-attr-name' ).val( paramid );
 			}
-			
+
 			return $trDom;
 		},
 
@@ -422,6 +349,82 @@
 			 * Injects required DOM elements to the edit screen
 			 */
 			init: function() {
+				// Prepare the globals:
+				glob = {
+					paramBase: {
+						name: {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-name' ),
+							dom: $( '<input>' )
+						},
+						aliases: {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-aliases' ),
+							dom: $( '<input>' )
+						},
+						label: {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-label' ),
+							dom: $( '<input>' )
+						},
+						description: {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-desc' ),
+							dom: $( '<textarea>' )
+						},
+						type: {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-type' ),
+							dom: $( '<select>' )
+						},
+						'default': {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-default' ),
+							dom: $( '<input>' )
+						},
+						'required': {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-required' ),
+							dom: $( '<input type="checkbox" />' )
+						},
+						delbutton: {
+							label: mw.msg( 'templatedatagenerator-modal-table-param-actions' ),
+							dom: $( '<button>' )
+								.addClass( 'tdg-param-button-del' )
+								.click( function() {
+									var paramid = $( this ).data( 'paramid' );
+									// delete the dom record:
+									delete glob.curr.paramDomElements[paramid];
+									// delete the actual row:
+									$( '#param-' + paramid ).remove();
+								} )
+						}
+					},
+					paramTypes: {
+						'undefined': mw.msg( 'templatedatagenerator-modal-table-param-type-undefined' ),
+						'number': mw.msg( 'templatedatagenerator-modal-table-param-type-number' ),
+						'string': mw.msg( 'templatedatagenerator-modal-table-param-type-string' ),
+						'string/wiki-user-name': mw.msg( 'templatedatagenerator-modal-table-param-type-user' ),
+						'string/wiki-page-name': mw.msg( 'templatedatagenerator-modal-table-param-type-page' )
+					},
+					domObjects: {
+						$editButton: $( '<button>' )
+							.addClass( 'tdg-editscreen-main-button' )
+							.text( mw.msg( 'templatedatagenerator-editbutton' ) ),
+						$errorBox: $( '<div>' )
+							.addClass( 'tdg-editscreen-error-msg' )
+							.hide(),
+						$errorModalBox: $( '<div>' )
+							.addClass( 'tdg-errorbox' )
+							.hide(),
+						$modalBox: $( '<div>' )
+							.addClass( 'tdg-editscreen-modal-form' )
+							.attr( 'id', 'modal-box' )
+							.attr( 'title', mw.msg( 'templatedatagenerator-modal-title' ) )
+							.hide(),
+						$modalTable: {},
+						$wikitextEditorBox: {}
+					},
+					curr: {
+						newTemplate: false,
+						paramDomElements: {},
+						paramsJson: {}
+					}
+				};
+
 				// Prepend to document:
 				$( '#mw-content-text' )
 					.prepend( glob.domObjects.$modalBox )
