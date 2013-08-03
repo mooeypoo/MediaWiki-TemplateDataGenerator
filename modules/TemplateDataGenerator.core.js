@@ -11,38 +11,31 @@
 			paramBase: {
 				name: {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-name' ),
-					dom: $( '<input>' ),
-					readMethod: 'val'
+					dom: $( '<input>' )
 				},
 				aliases: {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-aliases' ),
-					dom: $( '<input>' ),
-					readMethod: 'val'
+					dom: $( '<input>' )
 				},
 				label: {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-label' ),
-					dom: $( '<input>' ),
-					readMethod: 'val'
+					dom: $( '<input>' )
 				},
 				description: {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-desc' ),
-					dom: $( '<textarea>' ),
-					readMethod: 'val'
+					dom: $( '<textarea>' )
 				},
 				type: {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-type' ),
-					dom: $( '<select>' ),
-					readMethod: 'val'
+					dom: $( '<select>' )
 				},
 				'default': {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-default' ),
-					dom: $( '<input>' ),
-					readMethod: 'val'
+					dom: $( '<input>' )
 				},
 				'required': {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-required' ),
-					dom: $( '<input type="checkbox" />' ),
-					readMethod: 'chk'
+					dom: $( '<input type="checkbox" />' )
 				},
 				delbutton: {
 					label: mw.msg( 'templatedatagenerator-modal-table-param-actions' ),
@@ -54,8 +47,7 @@
 							delete glob.curr.paramDomElements[paramid];
 							// delete the actual row:
 							$( '#param-' + paramid ).remove();
-						} ),
-					readMethod: 'none'
+						} )
 				}
 			},
 			paramTypes: {
@@ -234,7 +226,7 @@
 				// Check if value already exists for this in the original json:
 				if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] && glob.curr.paramsJson.params[paramid][paramAttr] ) {
 					// make sure we set the value correctly based on the DOM element:
-					if ( paramAttrObj[paramAttr].is( ':checkbox' ) ) {
+					if ( paramAttrObj[paramAttr].prop('type') === 'checkbox' ) {
 						paramAttrObj[paramAttr].prop( 'checked', glob.curr.paramsJson.params[paramid][paramAttr] );
 					} else {
 						paramAttrObj[paramAttr].val( glob.curr.paramsJson.params[paramid][paramAttr] );
@@ -375,7 +367,7 @@
 							// Add the attributes that exist in the gui first:
 							for ( attrb in glob.curr.paramDomElements[paramid] ) {
 								if ( attrb !== 'delbutton' ) { //ignore the delbutton
-									if ( glob.curr.paramDomElements[paramid][attrb].is( ':checkbox' ) ) {
+									if ( glob.curr.paramDomElements[paramid][attrb].prop('type') === 'checkbox' ) {
 										outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].prop( 'checked' );
 									} else {
 										if ( attrb === 'aliases' ) {
