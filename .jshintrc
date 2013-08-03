@@ -16,7 +16,7 @@
         "undef": true,
         "unused": true,
         // Legacy
-        "onevar": true
+        "onevar": true,
 
         /* Local */
 
