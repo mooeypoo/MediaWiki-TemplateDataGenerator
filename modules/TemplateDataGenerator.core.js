@@ -231,7 +231,7 @@ var TemplateDataGenerator = ( function() {
 		// Go over the attributes for <td>s:
 		for ( paramAttr in paramAttrObj ) {
 			// Check if value already exists for this in the original json:
-			if ( glob.curr.paramsJson.params[paramid] && glob.curr.paramsJson.params[paramid][paramAttr] ) {
+			if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] && glob.curr.paramsJson.params[paramid][paramAttr] ) {
 				// make sure we set the value correctly based on the DOM element:
 				if ( paramAttrObj[paramAttr].is( ':checkbox' ) ) {
 					paramAttrObj[paramAttr].prop( 'checked', glob.curr.paramsJson.params[paramid][paramAttr] );
@@ -243,7 +243,7 @@ var TemplateDataGenerator = ( function() {
 		}
 
 		// Set up the name:
-		if ( glob.curr.paramsJson.params[paramid] ) {
+		if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] ) {
 			$trDom.find( '.tdg-param-attr-name' ).val( paramid );
 		}
 		return $trDom;
@@ -391,7 +391,7 @@ var TemplateDataGenerator = ( function() {
 						}
 
 						// Add attributes that are in the original json but not in GUI:
-						if ( glob.curr.paramsJson.params[paramid] ) {
+						if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] ) {
 							for ( attrb in glob.curr.paramsJson.params[paramid] ) {
 								// Only add this attribute if it appears in the original json, but not in the new json:
 								if ( glob.curr.paramsJson.params[paramid][attrb] && !outputJson.params[paramName][attrb] && attrb !== 'delbutton' ) {
@@ -402,7 +402,7 @@ var TemplateDataGenerator = ( function() {
 					}
 				}
 
-				if ( glob.curr.paramsJson ) {
+				if ( !jQuery.isEmptyObject( glob.curr.paramsJson ) ) {
 					// Return the json to the textbox:
 					finalOutput = wikitext.replace(
 						/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i,
