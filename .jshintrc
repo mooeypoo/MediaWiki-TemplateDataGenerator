@@ -23,7 +23,7 @@
 	"browser": true,
 
 	"predef": [
-		'mediaWiki',
-		'jQuery'
+		"mediaWiki",
+		"jQuery"
 	]
 }
