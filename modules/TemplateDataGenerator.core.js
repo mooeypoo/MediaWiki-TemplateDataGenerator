@@ -20,7 +20,20 @@
 			glob.domObjects.$errorBox.text( msg ).show();
 		}
 
-
+		/**
+		 * Helper function to clean up the aliases string-to-array
+		 *
+		 * @param {str} Comma separated string
+		 * @returns {array} Cleaned-up alias array
+		 */
+		function cleanupAliasArray ( str ) {
+			return $.map( str.split(','), function( item ) {
+				if ( $.trim( item ).length > 0 ) {
+					return $.trim( item );
+				}
+			} );
+		}
+		
 		/**
 		 * Show an error message in the GUI
 		 *
@@ -94,7 +107,7 @@
 							}
 							glob.curr.paramDomElements[param][attrb] = $tmpDom.clone( true );
 							glob.curr.paramDomElements[param][attrb].data( 'paramid', param );
-							glob.curr.paramDomElements[param][attrb].addClass( 'tdg-param-attr-' + attrb );
+							glob.curr.paramDomElements[param][attrb].addClass( 'tdg-element-attr-' + attrb );
 
 						}
 						// Set up the 'delete' button:
@@ -117,11 +130,15 @@
 		 * @returns {DOM} Table
 		 */
 		function createParamTableDOM () {
-			var $tbl, $tr, param;
+			var $tbl, $tr, attrb;
 
 			$tr = $( '<tr>' );
-			for ( param in glob.paramBase ) {
-				$tr.append( $( '<th>' ).text( glob.paramBase[param].label ) );
+			for ( attrb in glob.paramBase ) {
+				$tr.append(
+					$( '<th>' )
+						.html( glob.paramBase[attrb].label )
+						.addClass( 'tdg-title-' + attrb )
+					);
 			}
 
 			$tbl = $( '<table>' )
@@ -138,7 +155,8 @@
 		 * @returns {DOM} Table
 		 */
 		function translateParamToRowDom ( paramAttrObj ) {
-			var $trDom,
+			var $tdDom,
+				$trDom,
 				paramAttr,
 				paramid = paramAttrObj.delbutton.data( 'paramid' );
 
@@ -157,12 +175,20 @@
 						paramAttrObj[paramAttr].val( glob.curr.paramsJson.params[paramid][paramAttr] );
 					}
 				}
-				$trDom.append( $( '<td>' ).html( paramAttrObj[paramAttr] ) );
+				$tdDom = $( '<td>' ).html( paramAttrObj[paramAttr] ).addClass( 'tdg-attr-' + paramAttr );
+				// Add label to 'required' checkbox:
+				if ( paramAttr == 'required' ) {
+					$tdDom.append(
+						$( '<label>' )
+							.attr( 'for', paramAttr + '_paramid_' + paramid )
+							.text( glob.paramBase.required.label )
+					);
+				}
+				$trDom.append( $tdDom );
 			}
-
 			// Set up the name:
 			if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] ) {
-				$trDom.find( '.tdg-param-attr-name' ).val( paramid );
+				$trDom.find( '.tdg-element-attr-name' ).val( paramid );
 			}
 
 			return $trDom;
@@ -191,7 +217,8 @@
 				}
 				glob.curr.paramDomElements[paramid][attrb] = $tmpDom.clone( true );
 				glob.curr.paramDomElements[paramid][attrb].data( 'paramid', paramid );
-				glob.curr.paramDomElements[paramid][attrb].addClass( 'tdg-param-attr-' + attrb );
+				glob.curr.paramDomElements[paramid][attrb].attr( 'id', attrb + '_paramid_' + paramid );
+				glob.curr.paramDomElements[paramid][attrb].addClass( 'tdg-element-attr-' + attrb );
 
 			}
 			// Set up the 'delete' button:
@@ -295,18 +322,19 @@
 										outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].prop( 'checked' );
 									} else {
 										if ( attrb === 'aliases' ) {
-											outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].val().split(',');
-										}
+											// Split the string, trim the pieces and ignore empty ones:
+											outputJson.params[paramName][attrb] = cleanupArray( glob.curr.paramDomElements[paramid][attrb].val() );
+										} else {
 											outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].val();
+										}
 									}
 								}
 							}
-
 							// Add attributes that are in the original json but not in GUI:
 							if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] ) {
 								for ( attrb in glob.curr.paramsJson.params[paramid] ) {
 									// Only add this attribute if it appears in the original json, but not in the new json:
-									if ( glob.curr.paramsJson.params[paramid][attrb] && !outputJson.params[paramName][attrb] && attrb !== 'delbutton' ) {
+									if ( outputJson.params[paramName][attrb] === undefined && glob.curr.paramsJson.params[paramid][attrb] && attrb !== 'delbutton' ) {
 										outputJson.params[paramName][attrb] = glob.curr.paramsJson.params[paramid][attrb];
 									}
 								}
@@ -371,7 +399,7 @@
 						},
 						'default': {
 							label: mw.msg( 'templatedatagenerator-modal-table-param-default' ),
-							dom: $( '<input>' )
+							dom: $( '<textarea>' )
 						},
 						'required': {
 							label: mw.msg( 'templatedatagenerator-modal-table-param-required' ),
@@ -380,7 +408,8 @@
 						delbutton: {
 							label: mw.msg( 'templatedatagenerator-modal-table-param-actions' ),
 							dom: $( '<button>' )
-								.addClass( 'tdg-param-button-del' )
+								.button()
+								.addClass( 'tdg-param-button-del buttonRed' )
 								.click( function () {
 									var paramid = $( this ).data( 'paramid' );
 									// delete the dom record:
@@ -399,6 +428,7 @@
 					},
 					domObjects: {
 						$editButton: $( '<button>' )
+							.button()
 							.addClass( 'tdg-editscreen-main-button' )
 							.text( mw.msg( 'templatedatagenerator-editbutton' ) ),
 						$errorBox: $( '<div>' )
@@ -464,19 +494,20 @@
 
 				// Build the Modal window:
 				glob.domObjects.$modalBox
-					.append( $( '<span>' )
+					.append( $( '<h3>' )
 						.addClass( 'tdg-title' )
 						.text( mw.msg( 'templatedatagenerator-modal-title-templatedesc' ) )
 					)
 					.append( $descBox )
 					.append( glob.domObjects.$errorModalBox )
-					.append( $( '<span>' )
+					.append( $( '<h3>' )
 						.addClass( 'tdg-title' )
 						.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) )
 					)
 					.append( glob.domObjects.$modalTable )
 					.append(
 						$( '<button>' )
+							.button()
 							.text( mw.msg( 'templatedatagenerator-modal-button-addparam' ) )
 							.addClass( 'tdg-addparam' )
 							.click( function () {

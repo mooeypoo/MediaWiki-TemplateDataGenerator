@@ -47,7 +47,8 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 		'modules/TemplateDataGenerator.editPage.js'
 	),
 	'dependencies' => array(
-		'jquery.ui.dialog'
+		'jquery.ui.dialog',
+		'jquery.ui.button'
 	),
 	'messages' => array(
 		'templatedatagenerator-modal-title',

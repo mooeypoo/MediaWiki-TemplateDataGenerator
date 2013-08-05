@@ -24,6 +24,7 @@ class TemplateDataGeneratorHooks {
 
 		# Add modules
 		$wgOut->addModules( 'ext.templateDataGenerator' );
+//		$wgOut->addModules( 'ext.templateDataGenerator.bootstrap' );
 
 		return true;
 	}
