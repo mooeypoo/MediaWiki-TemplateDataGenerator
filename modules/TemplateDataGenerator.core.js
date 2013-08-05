@@ -177,7 +177,7 @@
 				}
 				$tdDom = $( '<td>' ).html( paramAttrObj[paramAttr] ).addClass( 'tdg-attr-' + paramAttr );
 				// Add label to 'required' checkbox:
-				if ( paramAttr == 'required' ) {
+				if ( paramAttr === 'required' ) {
 					$tdDom.append(
 						$( '<label>' )
 							.attr( 'for', paramAttr + '_paramid_' + paramid )
@@ -323,7 +323,7 @@
 									} else {
 										if ( attrb === 'aliases' ) {
 											// Split the string, trim the pieces and ignore empty ones:
-											outputJson.params[paramName][attrb] = cleanupArray( glob.curr.paramDomElements[paramid][attrb].val() );
+											outputJson.params[paramName][attrb] = cleanupAliasArray( glob.curr.paramDomElements[paramid][attrb].val() );
 										} else {
 											outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].val();
 										}
