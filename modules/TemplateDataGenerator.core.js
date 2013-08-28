@@ -259,7 +259,7 @@
 				}
 
 				// Check for illegal characters in param name:
-				if ( paramName.indexOf( "|" ) > -1 || paramName.indexOf( "=" ) > -1 || paramName.indexOf( "}}" ) > -1 ) {
+				if ( paramName.indexOf( '|' ) > -1 || paramName.indexOf( '=' ) > -1 || paramName.indexOf( '}}' ) > -1 ) {
 					passed = false;
 					paramProblem = true;
 				}
