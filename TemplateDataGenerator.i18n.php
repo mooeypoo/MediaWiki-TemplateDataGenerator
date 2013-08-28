@@ -19,7 +19,7 @@ $messages['en'] = array(
 	'templatedatagenerator-desc' => 'Assists with the generation and editing of the necessary JSON string required for VisualEditor\'s TemplateData',
 	'templatedatagenerator-editbutton' => 'Generate TemplateData',
 	'templatedatagenerator-errormsg-jsonbadformat' => 'Bad JSON format. Either correct it, or delete the current <templatedata> tags and try again.',
-	'templatedatagenerator-modal-errormsg' => 'Errors found. Please make sure there are no empty or duplicate parameter names.',
+	'templatedatagenerator-modal-errormsg' => 'Errors found. Please make sure there are no empty or duplicate parameter names, and that the parameter name does not include | = or }}',
 	'templatedatagenerator-modal-title' => 'TemplateData Generator',
 	'templatedatagenerator-modal-title-templatedesc' => 'Template description',
 	'templatedatagenerator-modal-title-templateparams' => 'Template parameters',

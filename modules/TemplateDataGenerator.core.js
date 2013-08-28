@@ -33,7 +33,7 @@
 				}
 			} );
 		}
-		
+
 		/**
 		 * Show an error message in the GUI
 		 *
@@ -238,27 +238,43 @@
 		 */
 		function validateForm () {
 			var paramID,
+				paramName,
 				paramNameArray = [],
-				passed = true;
+				passed = true,
+				paramProblem = false;
 			// Reset:
 			$( '.tdgerror' ).removeClass( 'tdgerror' );
 			glob.domObjects.$errorModalBox.empty().hide();
 			// Go over the paramDomElements object, look for:
 			// * empty name fields
 			// * duplicate *name* values:
+			// * illegal characters in name fields: pipe, equal, }}
 			for ( paramID in glob.curr.paramDomElements ) {
+				paramProblem = false;
+				paramName = glob.curr.paramDomElements[paramID].name.val();
 				// Name field is empty:
-				if ( glob.curr.paramDomElements[paramID].name.val().length === 0 ) {
+				if ( paramName.length === 0 ) {
 					passed = false;
-					glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
+					paramProblem = true;
 				}
 
-				if ( $.inArray( glob.curr.paramDomElements[paramID].name.val(), paramNameArray ) > -1 ) {
+				// Check for illegal characters in param name:
+				if ( paramName.indexOf( "|" ) > -1 || paramName.indexOf( "=" ) > -1 || paramName.indexOf( "}}" ) > -1 ) {
+					passed = false;
+					paramProblem = true;
+				}
+
+				// Check for dupes:
+				if ( $.inArray( paramName, paramNameArray ) > -1 ) {
 					// This is dupe!
 					passed = false;
-					glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
+					paramProblem = true;
 				} else {
-					paramNameArray.push( glob.curr.paramDomElements[paramID].name.val() );
+					paramNameArray.push( paramName );
+				}
+
+				if ( paramProblem ) {
+					glob.domObjects.$modalTable.find( '#param-' + paramID ).addClass( 'tdgerror' );
 				}
 			}
 			return passed;
@@ -314,6 +330,8 @@
 						// Transform paramid into param name, and ignore param with empty name:
 						if ( glob.curr.paramDomElements[paramid].name.val() ) {
 							paramName = glob.curr.paramDomElements[paramid].name.val();
+							// now delete 'name' property as it's no longer needed:
+							delete glob.curr.paramDomElements[paramid].name;
 							outputJson.params[paramName] = {};
 							// Add the attributes that exist in the gui first:
 							for ( attrb in glob.curr.paramDomElements[paramid] ) {
@@ -338,6 +356,10 @@
 										outputJson.params[paramName][attrb] = glob.curr.paramsJson.params[paramid][attrb];
 									}
 								}
+							}
+							// if 'type' is undefined, remove it:
+							if ( outputJson.params[paramName].type === 'undefined' ) {
+								delete outputJson.params[paramName].type;
 							}
 						}
 					}

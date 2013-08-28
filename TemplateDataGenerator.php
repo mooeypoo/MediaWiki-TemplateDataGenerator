@@ -53,6 +53,7 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 	'messages' => array(
 		'templatedatagenerator-modal-title',
 		'templatedatagenerator-editbutton',
+		'templatedatagenerator-modal-errormsg',
 		'templatedatagenerator-errormsg-jsonbadformat',
 		'templatedatagenerator-modal-title-templatedesc',
 		'templatedatagenerator-modal-title-templateparams',
