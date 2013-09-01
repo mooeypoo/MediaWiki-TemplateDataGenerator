@@ -55,6 +55,8 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 		'templatedatagenerator-editbutton',
 		'templatedatagenerator-modal-errormsg',
 		'templatedatagenerator-errormsg-jsonbadformat',
+		'templatedatagenerator-modal-errormsg-import-noparams',
+		'templatedatagenerator-modal-notice-import-numparams',
 		'templatedatagenerator-modal-title-templatedesc',
 		'templatedatagenerator-modal-title-templateparams',
 		'templatedatagenerator-modal-table-param-name',
@@ -72,6 +74,7 @@ $wgResourceModules['ext.templateDataGenerator'] = $templdatagenResourceTemplate 
 		'templatedatagenerator-modal-table-param-actions',
 		'templatedatagenerator-modal-button-addparam',
 		'templatedatagenerator-modal-button-delparam',
+		'templatedatagenerator-modal-button-importParams',
 		'templatedatagenerator-modal-buttons-apply',
 		'templatedatagenerator-modal-buttons-cancel',
 	)

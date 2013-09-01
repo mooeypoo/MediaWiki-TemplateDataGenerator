@@ -58,6 +58,10 @@
 	text-align: center;
 }
 
+.tdg-editTable .tdgerror {
+	background-color: #F2CBCB;
+}
+
 /** Start small, grow on focus: */
 .tdg-title-name,
 .tdg-title-aliases,

@@ -124,6 +124,34 @@
 		}
 
 		/**
+		 * Checks the wikitext for template parameters and imports
+		 * those that aren't yet in the templatedata list.
+		 * Adapted from https://he.wikipedia.org/wiki/%D7%9E%D7%93%D7%99%D7%94_%D7%95%D7%99%D7%A7%D7%99:Gadget-TemplateParamWizard.js
+		 */
+		function importTemplateParams( wikitext ) {
+			var paramExtractor = /{{3,}(.*?)[<|}]/mg,
+				newParam, matches, $row, paramCounter = 0;
+
+			while ( matches = paramExtractor.exec( wikitext ) ) {
+				// Make sure this parameter doesn't already exist in the paramsJson
+				if ( !glob.curr.paramsJson.params || !glob.curr.paramsJson.params[matches[1]] ) {
+					// add to domParams:
+					newParam = addParam();
+					newParam.name.val( matches[1] )	;
+					$row = translateParamToRowDom( newParam );
+					glob.domObjects.$modalTable.append( $row );
+					paramCounter++;
+				}
+			}
+
+			if ( paramCounter === 0 ) {
+				showErrorModal( mw.msg( 'templatedatagenerator-modal-errormsg-import-noparams' ) );
+			} else {
+				showErrorModal( mw.msg( 'templatedatagenerator-modal-notice-import-numparams', paramCounter ) );
+			}
+
+		}
+		/**
 		 * Create a <table> DOM with initial headings for the parameters
 		 * The table headings will go by the glob.paramBase
 		 *
@@ -294,6 +322,7 @@
 				paramsJson: {}
 			};
 		}
+
 		/**
 		 * Create i18n-compatible Modal Buttons
 		 * also contains the 'apply' functionality
@@ -308,77 +337,125 @@
 			modalButtons[btnApply] = function () {
 				var paramid,
 					paramName,
-					attrb,
+					paramProp,
 					wikitext = glob.domObjects.$wikitextEditorBox.val(),
-					outputJson = {},
-					finalOutput = '';
+					// compare the original to the new changes
+					outputJson = glob.curr.paramsJson,
+					finalOutput = '',
+					$domEl,
+					domElements,
+					newValue,
+					paramObj,
+					propExists;
 
 				//validate:
 				if ( !validateForm() ) {
 					showErrorModal( mw.msg( 'templatedatagenerator-modal-errormsg' ) );
 				} else {
-
-					// create a new json element by going over paramDomElements
-					// but also verify that within each param in paramDomElements
-					// all *attributes* that are not represented in the GUI
-					// are preserved.
-
+					// Update the description:
 					outputJson.description = $( '.tdg-template-description' ).val();
-					// Add parameters:
-					outputJson.params = {};
+					// First check if there's outpuJaon.params:
+					if ( !outputJson.params ) {
+						outputJson.params = {};
+					}
+					// Go over the parameters, check if param was marked as deleted
+					// in curr.paramsJson
 					for ( paramid in glob.curr.paramDomElements ) {
-						// Transform paramid into param name, and ignore param with empty name:
-						if ( glob.curr.paramDomElements[paramid].name.val() ) {
-							paramName = glob.curr.paramDomElements[paramid].name.val();
-							// now delete 'name' property as it's no longer needed:
-							delete glob.curr.paramDomElements[paramid].name;
-							outputJson.params[paramName] = {};
-							// Add the attributes that exist in the gui first:
-							for ( attrb in glob.curr.paramDomElements[paramid] ) {
-								if ( attrb !== 'delbutton' ) { //ignore the delbutton
-									if ( glob.curr.paramDomElements[paramid][attrb].prop('type') === 'checkbox' ) {
-										outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].prop( 'checked' );
-									} else {
-										if ( attrb === 'aliases' ) {
-											// Split the string, trim the pieces and ignore empty ones:
-											outputJson.params[paramName][attrb] = cleanupAliasArray( glob.curr.paramDomElements[paramid][attrb].val() );
+						domElements = glob.curr.paramDomElements[paramid];
+						// Get the name of the param:
+						paramName = domElements.name.val();
+
+						// New parameter added
+						if ( !outputJson.params[paramName] ) {
+							paramObj = outputJson.params[paramName] = {};
+						}
+						// Parameter marked for deletion:
+						if ( domElements.tdgMarkedForDeletion ) {
+							delete outputJson.params[paramName];
+							// move to next iteration:
+							continue;
+						} else {
+							paramObj = outputJson.params[paramName];
+						}
+
+						// Go over the properties that have DOM elements
+						for ( paramProp in domElements ) {
+							propExists = ( paramObj.hasOwnProperty( paramProp ) );
+							$domEl = domElements[paramProp];
+							// check if value changed:
+							switch ( paramProp ) {
+								case 'name':
+								case 'delbutton':
+									continue;
+								case 'aliases':
+									newValue = cleanupAliasArray( $domEl.val() );
+									if ( propExists && newValue.sort().join( '|' ) !== paramObj.aliases.sort().join( '|' ) ) {
+										// replace:
+										if ( newValue.length === 0 ) {
+											delete paramObj.aliases;
+											continue;
 										} else {
-											outputJson.params[paramName][attrb] = glob.curr.paramDomElements[paramid][attrb].val();
+											paramObj.aliases = newValue;
+										}
+									} else if ( !propExists ) {
+										if ( newValue.length > 0 ) {
+											paramObj.aliases = newValue;
 										}
 									}
-								}
-							}
-							// Add attributes that are in the original json but not in GUI:
-							if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] ) {
-								for ( attrb in glob.curr.paramsJson.params[paramid] ) {
-									// Only add this attribute if it appears in the original json, but not in the new json:
-									if ( outputJson.params[paramName][attrb] === undefined && glob.curr.paramsJson.params[paramid][attrb] && attrb !== 'delbutton' ) {
-										outputJson.params[paramName][attrb] = glob.curr.paramsJson.params[paramid][attrb];
+									break;
+								case 'description':
+								case 'default':
+								case 'label':
+									newValue = $domEl.val();
+									if ( paramObj[paramProp] !== newValue ) {
+										if ( !newValue || newValue.length === 0 ) {
+											delete paramObj[paramProp];
+											continue;
+										} else {
+											paramObj[paramProp] = newValue;
+										}
 									}
-								}
+									break;
+								case 'type':
+									newValue = $domEl.val();
+									if ( paramObj[paramProp] !== newValue ) {
+										if ( newValue === 'undefined' ) {
+											delete paramObj[paramProp];
+											continue;
+										} else {
+											paramObj[paramProp] = newValue;
+										}
+									}
+									break;
+								case 'required':
+									newValue = $domEl.prop( 'checked' );
+									if ( paramObj[paramProp] !== newValue && propExists ) {
+											paramObj[paramProp] = newValue;
+									}
+									break;
 							}
-							// if 'type' is undefined, remove it:
-							if ( outputJson.params[paramName].type === 'undefined' ) {
-								delete outputJson.params[paramName].type;
-							}
+
 						}
 					}
 
-					if ( !$.isEmptyObject( glob.curr.paramsJson ) ) {
-						// Return the json to the textbox:
+					// Check if we started with existing <templatedata> tags:
+					if ( wikitext.match(
+							/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i) ) {
+						// replace the <templatedata> tags
 						finalOutput = wikitext.replace(
 							/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i,
 							'<templatedata>\n' + JSON.stringify( outputJson, null, '	' ) + '\n</templatedata>'
 						);
 
 					} else {
-						// Append the json to the end of the textbox:
+						// add <templatedata> tags:
 						finalOutput = wikitext + '\n<templatedata>\n';
 						finalOutput += JSON.stringify( outputJson, null, '	' );
 						finalOutput += '\n</templatedata>';
 					}
-
+					// Append the json string:
 					glob.domObjects.$wikitextEditorBox.val( finalOutput );
+					// Close the modal:
 					glob.domObjects.$modalBox.dialog( 'close' );
 				}
 			};
@@ -434,9 +511,14 @@
 								.addClass( 'tdg-param-button-del buttonRed' )
 								.click( function () {
 									var paramid = $( this ).data( 'paramid' );
-									// delete the dom record:
-									delete glob.curr.paramDomElements[paramid];
-									// delete the actual row:
+									// flag as DELETED in glob.curr.paramDomElements[paramid] (property tdgDELETED)
+									if (glob.curr.paramDomElements[paramid]) {
+										glob.curr.paramDomElements[paramid].tdgMarkedForDeletion = true;
+									}
+									// delete the DOM row from table:
+									// (Don't delete property from paramDomElements,
+									// so when we go over the DOM elements on 'apply' this
+									// parameter is recognized as marked for deletion)
 									$( '#param-' + paramid ).remove();
 								} )
 						}
@@ -526,6 +608,14 @@
 						.addClass( 'tdg-title' )
 						.text( mw.msg( 'templatedatagenerator-modal-title-templateparams' ) )
 					)
+					.append(
+						$( '<button>' )
+							.text( mw.msg( 'templatedatagenerator-modal-button-importParams' ) )
+							.addClass( 'tdg-addparam' )
+							.click( function () {
+								// TODO: Check that we're not in the /doc subpage
+								importTemplateParams( glob.domObjects.$wikitextEditorBox.val() );
+							} ) )
 					.append( glob.domObjects.$modalTable )
 					.append(
 						$( '<button>' )
