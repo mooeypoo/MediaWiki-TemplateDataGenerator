@@ -132,7 +132,7 @@
 			var paramExtractor = /{{3,}(.*?)[<|}]/mg,
 				newParam, matches, $row, paramCounter = 0;
 
-			while ( matches = paramExtractor.exec( wikitext ) ) {
+			while ( ( matches = paramExtractor.exec( wikitext ) ) !== null ) {
 				// Make sure this parameter doesn't already exist in the paramsJson
 				if ( !glob.curr.paramsJson.params || !glob.curr.paramsJson.params[matches[1]] ) {
 					// add to domParams:
