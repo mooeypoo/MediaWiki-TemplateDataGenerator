@@ -130,14 +130,47 @@
 		 */
 		function importTemplateParams( wikitext ) {
 			var paramExtractor = /{{3,}(.*?)[<|}]/mg,
-				newParam, matches, $row, paramCounter = 0;
+				newParam, matches, $row, paramCounter = 0,
+				existingParamNamesArray = [], paramName;
+
+			// fill up the existingParamNameArray with GUI params
+			// So we can test against it while importing:
+			// We should go by param name, not param ID, because
+			// if the param is new, its id is new_randomString, and so
+			// the actual representation is the value of the name field.
+			for ( paramID in glob.curr.paramDomElements ) {
+				paramName = glob.curr.paramDomElements[paramID].name.val();
+				// validate
+				if (
+					paramName.length > 0 &&
+					!paramName.match( /[\|=]|}}/ ) &&
+					!glob.curr.paramDomElements[paramID].tdgMarkedForDeletion &&
+					$.inArray( paramName, existingParamNamesArray ) === -1
+				) {
+					existingParamNamesArray.push( paramName );
+				}
+			}
 
 			while ( ( matches = paramExtractor.exec( wikitext ) ) !== null ) {
-				// Make sure this parameter doesn't already exist in the paramsJson
-				if ( !glob.curr.paramsJson.params || !glob.curr.paramsJson.params[matches[1]] ) {
+				paramName = $.trim( matches[1] );
+				// make sure the template itself is not giving us bad params:
+				if (
+					paramName.length === 0 &&
+					paramName.match( /[\|=]|}}/ )
+				) {
+					continue;
+				}
+				// Make sure the param doesn't already exist in the GUI
+				if ( $.inArray( paramName, existingParamNamesArray ) > -1 ) {
+					// This is dupe, ignore it
+					continue;
+				} else {
+					// Add name to the existingParamNamesArray:
+					existingParamNamesArray.push( paramName );
+
 					// add to domParams:
 					newParam = addParam();
-					newParam.name.val( matches[1] )	;
+					newParam.name.val( paramName )	;
 					$row = translateParamToRowDom( newParam );
 					glob.domObjects.$modalTable.append( $row );
 					paramCounter++;
@@ -280,6 +313,12 @@
 			for ( paramID in glob.curr.paramDomElements ) {
 				paramProblem = false;
 				paramName = glob.curr.paramDomElements[paramID].name.val();
+
+				// ignore if the param was flagged for deletion:
+				if ( glob.curr.paramDomElements[paramID].tdgMarkedForDeletion ) {
+					continue;
+				}
+
 				// Name field is empty:
 				if ( paramName.length === 0 ) {
 					passed = false;
@@ -610,6 +649,7 @@
 					)
 					.append(
 						$( '<button>' )
+							.button()
 							.text( mw.msg( 'templatedatagenerator-modal-button-importParams' ) )
 							.addClass( 'tdg-addparam' )
 							.click( function () {
