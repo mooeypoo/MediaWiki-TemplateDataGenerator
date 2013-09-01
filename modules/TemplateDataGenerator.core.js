@@ -131,7 +131,7 @@
 		function importTemplateParams( wikitext ) {
 			var paramExtractor = /{{3,}(.*?)[<|}]/mg,
 				newParam, matches, $row, paramCounter = 0,
-				existingParamNamesArray = [], paramName;
+				existingParamNamesArray = [], paramName, paramID;
 
 			// fill up the existingParamNameArray with GUI params
 			// So we can test against it while importing:
