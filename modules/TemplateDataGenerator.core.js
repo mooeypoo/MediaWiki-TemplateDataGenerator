@@ -71,6 +71,7 @@
 			var attrb,
 				$tmpDom,
 				param,
+				OldParam,
 				jsonParams = {},
 				parts = wikitext.match(
 					/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i
@@ -93,11 +94,16 @@
 
 				// See if jsonParams has 'params'
 				if ( jsonParams && jsonParams.params ) {
-
 					// add dom elements to the json data params:
 					for ( param in jsonParams.params ) {
-						// trim:
-						param = $.trim( param );
+						// trim parameter key if it contains trailing/leading whitespace:
+						if ( param.match( /^\s+|\s+$/g ) ) {
+							OldParam = param;
+							param = $.trim( param );
+							jsonParams.params[param] = jsonParams.params[OldParam];
+							delete jsonParams.params[OldParam];
+						}
+
 						glob.curr.paramDomElements[param] = {};
 						// Create dom elements per parameter
 						for ( attrb in glob.paramBase ) {
@@ -141,7 +147,7 @@
 			// if the param is new, its id is new_randomString, and so
 			// the actual representation is the value of the name field.
 			for ( paramID in glob.curr.paramDomElements ) {
-				paramName = glob.curr.paramDomElements[paramID].name.val();
+				paramName = $.trim( glob.curr.paramDomElements[paramID].name.val() );
 				// validate
 				if (
 					paramName.length > 0 &&
@@ -221,6 +227,7 @@
 			var $tdDom,
 				$trDom,
 				paramAttr,
+				paramName,
 				paramid = paramAttrObj.delbutton.data( 'paramid' );
 
 			$trDom = $( '<tr>' )
@@ -320,7 +327,7 @@
 			for ( paramID in glob.curr.paramDomElements ) {
 				paramProblem = false;
 				// trim:
-				paramName = $.trim( glob.curr.paramDomElements[paramID].name.val() );
+				paramName = glob.curr.paramDomElements[paramID].name.val();
 				glob.curr.paramDomElements[paramID].name.val( paramName );
 
 				// ignore if the param was flagged for deletion:
