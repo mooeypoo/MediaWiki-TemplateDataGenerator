@@ -96,6 +96,8 @@
 
 					// add dom elements to the json data params:
 					for ( param in jsonParams.params ) {
+						// trim:
+						param = $.trim( param );
 						glob.curr.paramDomElements[param] = {};
 						// Create dom elements per parameter
 						for ( attrb in glob.paramBase ) {
@@ -228,7 +230,12 @@
 			// Go over the attributes for <td>s:
 			for ( paramAttr in paramAttrObj ) {
 				// Check if value already exists for this in the original json:
-				if ( glob.curr.paramsJson && glob.curr.paramsJson.params && glob.curr.paramsJson.params[paramid] && glob.curr.paramsJson.params[paramid][paramAttr] ) {
+				if ( 
+					glob.curr.paramsJson && 
+					glob.curr.paramsJson.params && 
+					glob.curr.paramsJson.params[paramid] && 
+					glob.curr.paramsJson.params[paramid][paramAttr] 
+				) {
 					// make sure we set the value correctly based on the DOM element:
 					if ( paramAttrObj[paramAttr].prop('type') === 'checkbox' ) {
 						paramAttrObj[paramAttr].prop( 'checked', glob.curr.paramsJson.params[paramid][paramAttr] );
@@ -312,7 +319,9 @@
 			// * illegal characters in name fields: pipe, equal, }}
 			for ( paramID in glob.curr.paramDomElements ) {
 				paramProblem = false;
-				paramName = glob.curr.paramDomElements[paramID].name.val();
+				// trim:
+				paramName = $.trim( glob.curr.paramDomElements[paramID].name.val() );
+				glob.curr.paramDomElements[paramID].name.val( paramName );
 
 				// ignore if the param was flagged for deletion:
 				if ( glob.curr.paramDomElements[paramID].tdgMarkedForDeletion ) {
