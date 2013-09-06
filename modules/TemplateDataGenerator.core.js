@@ -230,11 +230,11 @@
 			// Go over the attributes for <td>s:
 			for ( paramAttr in paramAttrObj ) {
 				// Check if value already exists for this in the original json:
-				if ( 
-					glob.curr.paramsJson && 
-					glob.curr.paramsJson.params && 
-					glob.curr.paramsJson.params[paramid] && 
-					glob.curr.paramsJson.params[paramid][paramAttr] 
+				if (
+					glob.curr.paramsJson &&
+					glob.curr.paramsJson.params &&
+					glob.curr.paramsJson.params[paramid] &&
+					glob.curr.paramsJson.params[paramid][paramAttr]
 				) {
 					// make sure we set the value correctly based on the DOM element:
 					if ( paramAttrObj[paramAttr].prop('type') === 'checkbox' ) {
