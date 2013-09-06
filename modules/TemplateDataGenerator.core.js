@@ -71,7 +71,8 @@
 			var attrb,
 				$tmpDom,
 				param,
-				OldParam,
+				trimmedParam,
+				arrayParamNamesForTrimming = [],
 				jsonParams = {},
 				parts = wikitext.match(
 					/(<templatedata>)([\s\S]*?)(<\/templatedata>)/i
@@ -97,14 +98,13 @@
 					// add dom elements to the json data params:
 					for ( param in jsonParams.params ) {
 						// trim parameter key if it contains trailing/leading whitespace:
-						if ( param.match( /^\s+|\s+$/g ) ) {
-							OldParam = param;
-							param = $.trim( param );
-							jsonParams.params[param] = jsonParams.params[OldParam];
-							delete jsonParams.params[OldParam];
+						trimmedParam = $.trim( param );
+						// insert into the array for later trimming:
+						if ( trimmedParam !== param ) {
+							arrayParamNamesForTrimming.push( param );
 						}
 
-						glob.curr.paramDomElements[param] = {};
+						glob.curr.paramDomElements[trimmedParam] = {};
 						// Create dom elements per parameter
 						for ( attrb in glob.paramBase ) {
 							// Set up the dom element:
@@ -113,20 +113,26 @@
 							} else {
 								$tmpDom = glob.paramBase[attrb].dom;
 							}
-							glob.curr.paramDomElements[param][attrb] = $tmpDom.clone( true );
-							glob.curr.paramDomElements[param][attrb].data( 'paramid', param );
-							glob.curr.paramDomElements[param][attrb].addClass( 'tdg-element-attr-' + attrb );
+							glob.curr.paramDomElements[trimmedParam][attrb] = $tmpDom.clone( true );
+							glob.curr.paramDomElements[trimmedParam][attrb].data( 'paramid', trimmedParam );
+							glob.curr.paramDomElements[trimmedParam][attrb].addClass( 'tdg-element-attr-' + attrb );
 
 						}
 						// Set up the 'delete' button:
-						glob.curr.paramDomElements[param].delbutton
+						glob.curr.paramDomElements[trimmedParam].delbutton
 							.text( mw.msg( 'templatedatagenerator-modal-button-delparam' ) )
 							.addClass( 'tdg-param-del' )
 							.attr( 'id', 'tdg-param-del' )
-							.data( 'paramid', param );
+							.data( 'paramid', trimmedParam );
 
 					}
 				}
+				// Trim the params we need to in the json object param keys:
+				$.each( arrayParamNamesForTrimming, function( index, paramid ) {
+					trimmedParam = $.trim( paramid );
+					jsonParams.params[trimmedParam] = jsonParams.params[paramid];
+					delete jsonParams.params[paramid];
+				} );
 			}
 			return jsonParams;
 		}
