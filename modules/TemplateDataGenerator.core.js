@@ -227,7 +227,6 @@
 			var $tdDom,
 				$trDom,
 				paramAttr,
-				paramName,
 				paramid = paramAttrObj.delbutton.data( 'paramid' );
 
 			$trDom = $( '<tr>' )
